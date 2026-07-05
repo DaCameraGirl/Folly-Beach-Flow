@@ -4,147 +4,597 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Folly Flow • Live Beach Conditions</title>
+  
+  <!-- Chart.js for the Tide Graph -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+  
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&display=swap');
+
+    * {
+      box-sizing: border-box;
+    }
 
     body {
       font-family: 'Inter', sans-serif;
-      background: linear-gradient(to bottom, #0a1428, #1e3a5f, #2a6b8a);
+      background: linear-gradient(135deg, #0a1428, #1e3a5f, #2a6b8a);
       color: #fff;
       min-height: 100vh;
       margin: 0;
       position: relative;
-      overflow: hidden;
+      overflow-x: hidden;
     }
 
-    .ocean {
-      position: absolute;
+    .ocean-bg {
+      position: fixed;
       bottom: 0;
       left: 0;
       width: 100%;
-      height: 60%;
-      background: linear-gradient(transparent, #0ea5e9);
+      height: 55%;
+      background: linear-gradient(transparent, rgba(14, 165, 233, 0.4));
       z-index: 1;
-      animation: wave 12s linear infinite;
+      animation: wave 10s ease-in-out infinite alternate;
     }
 
     @keyframes wave {
-      0% { transform: translateY(0); }
-      50% { transform: translateY(25px); }
-      100% { transform: translateY(0); }
+      0% { transform: translateY(10px); }
+      100% { transform: translateY(-10px); }
     }
 
     .container {
       position: relative;
       z-index: 2;
-      max-width: 580px;
-      margin: 40px auto;
-      padding: 2rem;
+      max-width: 680px;
+      margin: 30px auto;
+      padding: 2rem 1.5rem;
       text-align: center;
     }
 
     h1 {
       font-family: 'Playfair Display', serif;
-      font-size: 4rem;
-      background: linear-gradient(90deg, #67e8f9, #ffffff, #a5f3fc);
+      font-size: 3.6rem;
+      margin-bottom: 0;
+      background: linear-gradient(90deg, #67e8f9, #ffffff);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      margin-bottom: 0.1rem;
-      text-shadow: 0 0 40px rgba(103,232,249,0.6);
+      background-clip: text;
     }
 
-    .tagline {
-      color: #bae6fd;
-      font-size: 1.35rem;
-      margin-bottom: 2.5rem;
+    .tagline { 
+      color: #bae6fd; 
+      font-size: 1.25rem; 
+      margin: 0.5rem 0 2rem;
     }
 
     .card {
-      background: rgba(255,255,255,0.12);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(103,232,249,0.4);
-      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(103, 232, 249, 0.3);
+      border-radius: 24px;
       padding: 2rem;
-      margin: 1.8rem 0;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+      margin: 1.5rem 0;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+      text-align: left;
+    }
+
+    .card-header {
+      font-weight: 600;
+      color: #bae6fd;
+      margin-bottom: 1.5rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 0.9rem;
+    }
+
+    .stat-display {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .stat-box {
+      background: rgba(103, 232, 249, 0.1);
+      border: 1px solid rgba(103, 232, 249, 0.3);
+      border-radius: 12px;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 2.4rem;
+      font-weight: 700;
+      color: #67e8f9;
+      margin: 0;
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      color: #bae6fd;
+      margin-top: 0.5rem;
     }
 
     .meter {
-      height: 42px;
-      background: #112233;
+      height: 28px;
+      background: rgba(17, 34, 51, 0.8);
       border-radius: 9999px;
       overflow: hidden;
-      margin: 1.2rem 0;
+      margin: 1.5rem 0;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
     }
+    
     .fill {
       height: 100%;
       width: 38%;
-      background: linear-gradient(90deg, #22d3ee, #67e8f9, #c4f1fd);
-      transition: width 2s ease;
-      box-shadow: 0 0 35px #67e8f9;
+      background: linear-gradient(90deg, #22d3ee, #67e8f9);
+      transition: width 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      border-radius: 9999px;
+      box-shadow: 0 0 15px rgba(103, 232, 249, 0.6);
+    }
+
+    /* Bridge Traffic Animation */
+    .road-container {
+      height: 40px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
+      border: 1px solid rgba(103, 232, 249, 0.2);
+      border-radius: 8px;
+      position: relative;
+      overflow: hidden;
+      margin: 1.5rem 0;
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+    }
+
+    .road-label {
+      position: absolute;
+      left: 12px;
+      font-size: 0.75rem;
+      color: #bae6fd;
+      font-weight: 600;
+      text-transform: uppercase;
+      z-index: 3;
+    }
+
+    .cars-track {
+      position: relative;
+      width: 100%;
+      height: 20px;
+      margin-left: 60px;
+    }
+
+    .car {
+      position: absolute;
+      top: 2px;
+      width: 12px;
+      height: 16px;
+      background: linear-gradient(135deg, #22d3ee, #67e8f9);
+      border-radius: 2px;
+      box-shadow: 0 0 8px rgba(103, 232, 249, 0.8);
+      opacity: 0.9;
+    }
+
+    .car.slow {
+      background: linear-gradient(135deg, #fb923c, #f97316);
+      box-shadow: 0 0 8px rgba(249, 115, 22, 0.8);
+    }
+
+    @keyframes driveFast {
+      to { transform: translateX(calc(100vw + 50px)); }
+    }
+
+    @keyframes driveSlow {
+      to { transform: translateX(calc(100vw + 50px)); }
+    }
+
+    .speed-fast { animation: driveFast 2.5s linear infinite; }
+    .speed-slow { animation: driveSlow 7s linear infinite; }
+
+    /* Tide Chart */
+    .tide-container {
+      position: relative;
+      height: 250px;
+      width: 100%;
+      margin: 1.5rem 0;
+    }
+
+    .tide-info {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+    }
+
+    .tide-stat {
+      background: rgba(103, 232, 249, 0.1);
+      padding: 0.8rem;
+      border-radius: 8px;
+      border-left: 3px solid #67e8f9;
+    }
+
+    .tide-stat-value {
+      font-weight: 700;
+      color: #67e8f9;
+      font-size: 1.3rem;
+    }
+
+    .tide-stat-label {
+      color: #bae6fd;
+      font-size: 0.8rem;
+      margin-top: 0.3rem;
     }
 
     button {
       background: linear-gradient(90deg, #22d3ee, #67e8f9);
       color: #0a1428;
       border: none;
-      padding: 18px 60px;
-      font-size: 1.3rem;
+      padding: 16px 50px;
+      font-size: 1.1rem;
       font-weight: 700;
       border-radius: 9999px;
       cursor: pointer;
-      box-shadow: 0 15px 45px rgba(103,232,249,0.5);
-      margin: 1rem 0;
-    }
-    button:hover {
-      transform: scale(1.08);
+      margin: 1.5rem 0;
+      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(103, 232, 249, 0.4);
     }
 
-    .footer {
-      margin-top: 4rem;
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(103, 232, 249, 0.6);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .status-text {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #fff;
+      margin: 0.5rem 0;
+    }
+
+    .status-subtext {
+      font-size: 0.95rem;
+      color: #bae6fd;
+      margin: 0.5rem 0 0 0;
+    }
+
+    .timestamp {
+      margin-top: 2rem;
       color: #94a3b8;
-      font-size: 1rem;
+      font-size: 0.85rem;
+    }
+
+    .loading {
+      text-align: center;
+      color: #94a3b8;
+      font-size: 0.9rem;
+      padding: 1rem;
+    }
+
+    .error {
+      color: #fb923c;
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 2.5rem;
+      }
+
+      .container {
+        padding: 1.5rem 1rem;
+        margin: 20px auto;
+      }
+
+      .stat-display {
+        grid-template-columns: 1fr;
+      }
+
+      .stat-value {
+        font-size: 2rem;
+      }
+
+      .card {
+        padding: 1.5rem;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="ocean"></div>
+  <div class="ocean-bg"></div>
 
   <div class="container">
     <h1>Folly Flow</h1>
-    <p class="tagline">Real-time Beach Conditions • Folly Beach, SC 🌊</p>
+    <p class="tagline">Live Beach Conditions • Folly Beach, SC 🌊</p>
 
+    <!-- Crowd Level Card -->
+    <div class="card" style="text-align: center;">
+      <div class="card-header">Current Crowd Level</div>
+      <p id="status" class="status-text">Chill • 3.8 / 10</p>
+      <div class="meter"><div class="fill" id="fill" style="width:38%"></div></div>
+      <p id="crowdDesc" class="status-subtext">The beach is pretty relaxed right now 🏖️</p>
+    </div>
+
+    <!-- Bridge Traffic Card -->
     <div class="card">
-      <p><strong>Current Crowd Level</strong></p>
-      <div class="meter"><div class="fill" id="fill"></div></div>
-      <p id="status" style="font-size:2.1rem; font-weight:700; color:#67e8f9; margin:0.8rem 0;">Chill • 4.2 / 10</p>
+      <div class="card-header">🌉 Bridge Traffic (Coming In)</div>
+      <p id="bridge-status" class="status-text">Light & Flowing</p>
+      <p id="bridge-count" class="status-subtext">~45 vehicles/min</p>
+      
+      <div class="road-container">
+        <span class="road-label">→</span>
+        <div class="cars-track" id="bridge-track"></div>
+      </div>
     </div>
 
+    <!-- Beach Traffic Card -->
     <div class="card">
-      <p><strong>🚗 Folly Road Traffic</strong></p>
-      <p style="font-size:1.5rem; margin:0.8rem 0;">Light & Flowing</p>
-      <p>No major delays • Post-holiday crowd has left</p>
+      <div class="card-header">🅿️ Beach Lot Traffic (Departing)</div>
+      <p id="lot-status" class="status-text">Light</p>
+      <p id="lot-count" class="status-subtext">~32 vehicles/min</p>
+      
+      <div class="road-container">
+        <span class="road-label">←</span>
+        <div class="cars-track" id="lot-track"></div>
+      </div>
     </div>
 
+    <!-- Tide Forecast Card -->
     <div class="card">
-      <p><strong>🌊 Tide Information</strong></p>
-      <p style="font-size:1.4rem; margin:0.6rem 0;">High Tide: 6:42 PM (4.8 ft)</p>
-      <p>Low Tide: 1:15 AM (0.9 ft)</p>
+      <div class="card-header">🌊 Today's Tide Forecast</div>
+      <div class="tide-container">
+        <canvas id="tideChart"></canvas>
+      </div>
+      <div id="tide-loading" class="loading">Fetching live NOAA data...</div>
+      <div class="tide-info" id="tide-info" style="display: none;">
+        <div class="tide-stat">
+          <div class="tide-stat-value" id="tide-high">4.2 ft</div>
+          <div class="tide-stat-label">High Tide</div>
+        </div>
+        <div class="tide-stat">
+          <div class="tide-stat-value" id="tide-low">0.8 ft</div>
+          <div class="tide-stat-label">Low Tide</div>
+        </div>
+      </div>
     </div>
 
-    <button onclick="refresh()">⟳ Refresh All Conditions</button>
-
-    <div class="footer">
-      Updated • July 5, 2026 • 3:45 PM
-    </div>
+    <button onclick="refreshData()">⟳ Refresh Conditions</button>
+    <p id="timestamp" class="timestamp">Updated • Just now</p>
   </div>
 
   <script>
-    function refresh() {
-      document.getElementById('fill').style.width = (20 + Math.random() * 55) + "%";
-      document.getElementById('status').textContent = "Chill • " + (2.5 + Math.random()*5).toFixed(1) + " / 10";
-      alert("🌊 Conditions updated — Folly is looking chill right now!");
+    let tideChartInstance = null;
+
+    const CROWD_DESCRIPTIONS = {
+      chill: "The beach is pretty relaxed right now 🏖️",
+      moderate: "Getting a bit busier, but still plenty of space 🌊",
+      busy: "It's getting crowded! Parking might be tight 🏄",
+      packed: "Beach is packed! Consider coming back later 🚫"
+    };
+
+    // Fetch real tide data from NOAA API (Charleston Station: 8665530)
+    async function fetchTides() {
+      try {
+        const url = 'https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?date=today&station=8665530&product=predictions&datum=MLLW&time_zone=lst_ldt&interval=h&units=english&format=json';
+        const response = await fetch(url);
+        
+        if (!response.ok) throw new Error('API Error');
+        
+        const data = await response.json();
+        
+        if (!data.predictions || data.predictions.length === 0) {
+          throw new Error('No predictions returned');
+        }
+        
+        document.getElementById('tide-loading').style.display = 'none';
+        document.getElementById('tide-info').style.display = 'grid';
+        
+        const labels = data.predictions.map(p => {
+          let date = new Date(p.t);
+          return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        });
+        
+        const levels = data.predictions.map(p => parseFloat(p.v));
+        const highTide = Math.max(...levels).toFixed(1);
+        const lowTide = Math.min(...levels).toFixed(1);
+
+        document.getElementById('tide-high').textContent = highTide + ' ft';
+        document.getElementById('tide-low').textContent = lowTide + ' ft';
+
+        renderTideChart(labels, levels);
+      } catch (error) {
+        console.error("NOAA API Error:", error);
+        document.getElementById('tide-loading').innerHTML = "<span class='error'>⚠️ Could not load live tides. Using sample data.</span>";
+        
+        // Fallback: generate realistic sample data
+        const now = new Date();
+        const labels = [];
+        const levels = [];
+        
+        for (let i = 0; i < 24; i++) {
+          const hour = new Date(now.getTime() + i * 3600000);
+          labels.push(hour.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+          // Generate a sine wave for realistic tide pattern
+          levels.push(2.5 + 1.8 * Math.sin((i / 24) * Math.PI * 2));
+        }
+        
+        document.getElementById('tide-high').textContent = '4.3 ft';
+        document.getElementById('tide-low').textContent = '0.7 ft';
+        document.getElementById('tide-info').style.display = 'grid';
+        
+        renderTideChart(labels, levels);
+      }
     }
+
+    function renderTideChart(labels, data) {
+      const ctx = document.getElementById('tideChart').getContext('2d');
+      
+      let gradient = ctx.createLinearGradient(0, 0, 0, 250);
+      gradient.addColorStop(0, 'rgba(103, 232, 249, 0.6)');
+      gradient.addColorStop(0.5, 'rgba(103, 232, 249, 0.3)');
+      gradient.addColorStop(1, 'rgba(103, 232, 249, 0.0)');
+
+      if (tideChartInstance) tideChartInstance.destroy();
+
+      tideChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Water Level (ft)',
+            data: data,
+            borderColor: '#67e8f9',
+            borderWidth: 3,
+            backgroundColor: gradient,
+            fill: true,
+            tension: 0.4,
+            pointRadius: 0,
+            borderJoin: 'round'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { 
+            legend: { display: false },
+            filler: {
+              propagate: true
+            }
+          },
+          scales: {
+            x: { 
+              grid: { display: false }, 
+              ticks: { color: '#bae6fd', maxTicksLimit: 6, font: { size: 11 } } 
+            },
+            y: { 
+              grid: { color: 'rgba(255, 255, 255, 0.1)' }, 
+              ticks: { color: '#bae6fd', font: { size: 11 } } 
+            }
+          }
+        }
+      });
+    }
+
+    function createTrafficCars(count, speed = 'fast') {
+      const track = document.createElement('div');
+      const spacing = 100 / count;
+      
+      for (let i = 0; i < count; i++) {
+        const car = document.createElement('div');
+        car.className = `car ${speed === 'fast' ? '' : 'slow'}`;
+        car.style.left = (i * spacing) + '%';
+        car.style.animationDelay = (i * 0.5) + 's';
+        car.style.animationDuration = (speed === 'fast' ? 2.5 : 7) + 's';
+        car.style.animationName = speed === 'fast' ? 'driveFast' : 'driveSlow';
+        track.appendChild(car);
+      }
+      
+      return track;
+    }
+
+    function updateTrafficFlow(crowdScore) {
+      const bridgeTrack = document.getElementById('bridge-track');
+      const lotTrack = document.getElementById('lot-track');
+      const bridgeStatus = document.getElementById('bridge-status');
+      const lotStatus = document.getElementById('lot-status');
+      const bridgeCount = document.getElementById('bridge-count');
+      const lotCount = document.getElementById('lot-count');
+
+      // Bridge traffic increases with crowd
+      let bridgeCars, bridgeFlowStatus, bridgeFlowRate;
+      if (crowdScore < 3) {
+        bridgeCars = 3;
+        bridgeFlowStatus = "Light & Flowing 🟢";
+        bridgeFlowRate = "~30 vehicles/min";
+      } else if (crowdScore < 5) {
+        bridgeCars = 4;
+        bridgeFlowStatus = "Moderate Flow 🟡";
+        bridgeFlowRate = "~45 vehicles/min";
+      } else if (crowdScore < 7) {
+        bridgeCars = 5;
+        bridgeFlowStatus = "Heavy Traffic 🟠";
+        bridgeFlowRate = "~65 vehicles/min";
+      } else {
+        bridgeCars = 6;
+        bridgeFlowStatus = "Congested 🔴";
+        bridgeFlowRate = "~85 vehicles/min";
+      }
+
+      // Lot traffic (departing) increases slightly as crowd builds
+      let lotCars, lotFlowStatus, lotFlowRate;
+      if (crowdScore < 3) {
+        lotCars = 2;
+        lotFlowStatus = "Light";
+        lotFlowRate = "~20 vehicles/min";
+      } else if (crowdScore < 6) {
+        lotCars = 3;
+        lotFlowStatus = "Steady";
+        lotFlowRate = "~35 vehicles/min";
+      } else {
+        lotCars = 4;
+        lotFlowStatus = "Heavy";
+        lotFlowRate = "~50 vehicles/min";
+      }
+
+      bridgeTrack.innerHTML = '';
+      lotTrack.innerHTML = '';
+      
+      const bridgeFlow = crowdScore > 6 ? 'slow' : 'fast';
+      const lotFlow = crowdScore > 6 ? 'slow' : 'fast';
+      
+      const bridgeCarsHtml = createTrafficCars(bridgeCars, bridgeFlow);
+      const lotCarsHtml = createTrafficCars(lotCars, lotFlow);
+      
+      bridgeTrack.appendChild(bridgeCarsHtml);
+      lotTrack.appendChild(lotCarsHtml);
+
+      bridgeStatus.textContent = bridgeFlowStatus;
+      bridgeCount.textContent = bridgeFlowRate;
+      lotStatus.textContent = lotFlowStatus;
+      lotCount.textContent = lotFlowRate;
+    }
+
+    function refreshData() {
+      const crowdScore = 2.8 + Math.random() * 7.2; // 2.8 to 10
+      const fillPercentage = crowdScore * 10;
+      
+      document.getElementById('fill').style.width = fillPercentage + "%";
+      
+      let crowdStatus = "Chill";
+      let crowdDesc = CROWD_DESCRIPTIONS.chill;
+      
+      if (crowdScore > 5) {
+        crowdStatus = "Busy";
+        crowdDesc = CROWD_DESCRIPTIONS.moderate;
+      }
+      if (crowdScore > 6.5) {
+        crowdStatus = "Very Busy";
+        crowdDesc = CROWD_DESCRIPTIONS.busy;
+      }
+      if (crowdScore > 8) {
+        crowdStatus = "Packed";
+        crowdDesc = CROWD_DESCRIPTIONS.packed;
+      }
+      
+      document.getElementById('status').textContent = `${crowdStatus} • ${crowdScore.toFixed(1)} / 10`;
+      document.getElementById('crowdDesc').textContent = crowdDesc;
+
+      updateTrafficFlow(crowdScore);
+
+      // Update timestamp
+      document.getElementById('timestamp').textContent = "Updated • " + new Date().toLocaleTimeString();
+    }
+
+    // Initialize on load
+    window.addEventListener('load', () => {
+      fetchTides();
+      refreshData();
+      // Auto-refresh every 30 seconds
+      setInterval(refreshData, 30000);
+    });
   </script>
 </body>
 </html>
