@@ -30,15 +30,62 @@
       bottom: 0;
       left: 0;
       width: 100%;
-      height: 55%;
-      background: linear-gradient(transparent, rgba(14, 165, 233, 0.4));
+      height: 60%;
       z-index: 1;
-      animation: wave 10s ease-in-out infinite alternate;
+      background: linear-gradient(180deg, transparent 0%, rgba(14, 165, 233, 0.15) 40%, rgba(6, 182, 212, 0.3) 100%);
+      overflow: hidden;
     }
 
-    @keyframes wave {
-      0% { transform: translateY(10px); }
-      100% { transform: translateY(-10px); }
+    /* Multiple wave layers for depth */
+    svg.wave {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .wave-fill {
+      fill: url(#waveGradient);
+      opacity: 0.8;
+    }
+
+    .wave-fill-deep {
+      fill: url(#waveGradientDeep);
+      opacity: 0.6;
+    }
+
+    .wave-fill-deeper {
+      fill: url(#waveGradientDeeper);
+      opacity: 0.4;
+    }
+
+    /* Wave animations at different speeds for depth effect */
+    @keyframes wave1 {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(100%); }
+    }
+
+    @keyframes wave2 {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-100%); }
+    }
+
+    @keyframes wave3 {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(100%); }
+    }
+
+    .wave-fast {
+      animation: wave1 8s linear infinite;
+    }
+
+    .wave-medium {
+      animation: wave2 12s linear infinite;
+    }
+
+    .wave-slow {
+      animation: wave3 16s linear infinite;
     }
 
     .container {
@@ -300,11 +347,15 @@
       .card {
         padding: 1.5rem;
       }
+
+      .ocean-bg {
+        height: 50%;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="ocean-bg"></div>
+  <div class="ocean-bg" id="oceanBg"></div>
 
   <div class="container">
     <h1>Folly Flow</h1>
@@ -374,6 +425,70 @@
       busy: "It's getting crowded! Parking might be tight 🏄",
       packed: "Beach is packed! Consider coming back later 🚫"
     };
+
+    // Create animated ocean waves
+    function createOceanWaves() {
+      const oceanBg = document.getElementById('oceanBg');
+      oceanBg.innerHTML = '';
+
+      // Create SVG waves with different speeds for depth effect
+      const waveConfigs = [
+        { class: 'wave-fast', yOffset: 0, amplitude: 30, frequency: 0.015 },
+        { class: 'wave-medium', yOffset: 40, amplitude: 25, frequency: 0.012 },
+        { class: 'wave-slow', yOffset: 70, amplitude: 20, frequency: 0.01 }
+      ];
+
+      waveConfigs.forEach((config, index) => {
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('viewBox', '0 0 1200 120');
+        svg.setAttribute('preserveAspectRatio', 'none');
+        svg.setAttribute('class', `wave ${config.class}`);
+        svg.style.height = '100%';
+
+        const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+        
+        // Create gradients for each wave layer
+        const gradientId = `waveGradient${index}`;
+        const gradient = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
+        gradient.setAttribute('id', gradientId);
+        gradient.setAttribute('x1', '0%');
+        gradient.setAttribute('y1', '0%');
+        gradient.setAttribute('x2', '0%');
+        gradient.setAttribute('y2', '100%');
+
+        const stops = [
+          { offset: '0%', color: `rgba(34, 211, 238, ${0.4 - index * 0.1})` },
+          { offset: '50%', color: `rgba(6, 182, 212, ${0.3 - index * 0.08})` },
+          { offset: '100%', color: `rgba(3, 102, 214, ${0.2 - index * 0.05})` }
+        ];
+
+        stops.forEach(stop => {
+          const st = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+          st.setAttribute('offset', stop.offset);
+          st.setAttribute('stop-color', stop.color);
+          gradient.appendChild(st);
+        });
+
+        defs.appendChild(gradient);
+        svg.appendChild(defs);
+
+        // Create wave path with sine wave pattern
+        let pathData = 'M0,60';
+        for (let x = 0; x <= 1200; x += 30) {
+          const y = 60 + Math.sin(x * config.frequency) * config.amplitude;
+          pathData += ` L${x},${y}`;
+        }
+        pathData += ' L1200,120 L0,120 Z';
+
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', pathData);
+        path.setAttribute('fill', `url(#${gradientId})`);
+        path.setAttribute('opacity', '0.7');
+
+        svg.appendChild(path);
+        oceanBg.appendChild(svg);
+      });
+    }
 
     // Fetch real tide data from NOAA API (Charleston Station: 8665530)
     async function fetchTides() {
@@ -590,6 +705,7 @@
 
     // Initialize on load
     window.addEventListener('load', () => {
+      createOceanWaves();
       fetchTides();
       refreshData();
       // Auto-refresh every 30 seconds
