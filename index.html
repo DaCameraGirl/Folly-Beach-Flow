@@ -4,6 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Folly Flow • Live Beach Conditions</title>
+  
+  <!-- Chart.js for the Tide Graph -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&display=swap');
 
@@ -14,24 +18,23 @@
       min-height: 100vh;
       margin: 0;
       position: relative;
-      overflow: hidden;
+      overflow-x: hidden;
     }
 
     .ocean {
-      position: absolute;
+      position: fixed;
       bottom: 0;
       left: 0;
       width: 100%;
       height: 55%;
-      background: linear-gradient(transparent, #0ea5e9);
+      background: linear-gradient(transparent, rgba(14, 165, 233, 0.4));
       z-index: 1;
-      animation: wave 10s linear infinite;
+      animation: wave 10s ease-in-out infinite alternate;
     }
 
     @keyframes wave {
-      0% { transform: translateY(0); }
-      50% { transform: translateY(20px); }
-      100% { transform: translateY(0); }
+      0% { transform: translateY(10px); }
+      100% { transform: translateY(-10px); }
     }
 
     .container {
@@ -46,6 +49,7 @@
     h1 {
       font-family: 'Playfair Display', serif;
       font-size: 3.6rem;
+      margin-bottom: 0;
       background: linear-gradient(90deg, #67e8f9, #ffffff);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -56,25 +60,73 @@
     .card {
       background: rgba(255,255,255,0.1);
       backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       border: 1px solid rgba(103,232,249,0.3);
       border-radius: 24px;
       padding: 1.8rem;
       margin: 1.5rem 0;
       box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+      text-align: left;
+    }
+
+    .card-header {
+      font-weight: 600;
+      color: #bae6fd;
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 0.9rem;
     }
 
     .meter {
-      height: 34px;
-      background: #112233;
+      height: 24px;
+      background: rgba(17, 34, 51, 0.6);
       border-radius: 9999px;
       overflow: hidden;
       margin: 1rem 0;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
     }
+    
     .fill {
       height: 100%;
       width: 38%;
       background: linear-gradient(90deg, #22d3ee, #67e8f9);
       transition: width 1.8s ease;
+      border-radius: 9999px;
+    }
+
+    /* Traffic Animation Styles */
+    .road-container {
+      height: 6px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 3px;
+      position: relative;
+      overflow: hidden;
+      margin-top: 1.5rem;
+    }
+
+    .car {
+      position: absolute;
+      top: 0;
+      left: -20px;
+      width: 15px;
+      height: 100%;
+      background: #67e8f9;
+      border-radius: 3px;
+      box-shadow: 0 0 10px #67e8f9;
+      opacity: 0.8;
+    }
+
+    @keyframes driveFast { to { left: 100%; } }
+    @keyframes driveSlow { to { left: 100%; } }
+
+    .speed-fast { animation: driveFast 2s linear infinite; }
+    .speed-slow { animation: driveSlow 8s linear infinite; background: #fb923c; box-shadow: 0 0 10px #fb923c; }
+
+    .tide-container {
+      position: relative;
+      height: 200px;
+      width: 100%;
     }
 
     button {
@@ -82,12 +134,16 @@
       color: #0a1428;
       border: none;
       padding: 16px 50px;
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       font-weight: 700;
       border-radius: 9999px;
       cursor: pointer;
       margin: 1rem 0;
+      transition: transform 0.2s;
     }
+    button:hover { transform: scale(1.05); }
+    
+    .status-text { font-size: 1.8rem; font-weight: 700; color: #fff; margin: 0; }
   </style>
 </head>
 <body>
@@ -97,35 +153,139 @@
     <h1>Folly Flow</h1>
     <p class="tagline">Live Beach Conditions • Folly Beach, SC 🌊</p>
 
-    <div class="card">
-      <p><strong>Current Crowd Level</strong></p>
+    <div class="card" style="text-align: center;">
+      <div class="card-header">Current Crowd Level</div>
+      <p id="status" class="status-text">Chill • 3.8 / 10</p>
       <div class="meter"><div class="fill" id="fill" style="width:38%"></div></div>
-      <p id="status" style="font-size:1.9rem; font-weight:700; color:#67e8f9;">Chill • 3.8 / 10</p>
     </div>
 
     <div class="card">
-      <p><strong>🚗 Folly Road Traffic</strong></p>
-      <p style="font-size:1.4rem; margin:0.8rem 0;">Light &amp; Flowing</p>
-      <p>No major delays right now</p>
+      <div class="card-header">🚗 Center Street Traffic</div>
+      <p id="traffic-status" class="status-text">Light & Flowing</p>
+      
+      <!-- Traffic Animation Container -->
+      <div class="road-container" id="road">
+        <div class="car speed-fast"></div>
+        <div class="car speed-fast" style="animation-delay: 0.6s"></div>
+        <div class="car speed-fast" style="animation-delay: 1.4s"></div>
+      </div>
     </div>
 
     <div class="card">
-      <p><strong>🌊 Tide Now</strong></p>
-      <p style="font-size:1.5rem; margin:0.5rem 0;">High Tide at 6:42 PM (4.8 ft)</p>
-      <p>Low Tide at 1:15 AM (0.9 ft)</p>
+      <div class="card-header">🌊 Today's Tide Forecast</div>
+      <div class="tide-container">
+        <canvas id="tideChart"></canvas>
+      </div>
+      <p id="tide-loading" style="text-align: center; font-size: 0.9rem; color: #94a3b8;">Fetching live NOAA data...</p>
     </div>
 
-    <button onclick="refresh()">⟳ Refresh All Conditions</button>
-
-    <p style="margin-top:3rem; color:#94a3b8;">Updated • July 5, 2026 • 3:43 PM</p>
+    <button onclick="refreshData()">⟳ Refresh Conditions</button>
+    <p id="timestamp" style="margin-top:2rem; color:#94a3b8; font-size: 0.9rem;">Updated • Just now</p>
   </div>
 
   <script>
-    function refresh() {
-      document.getElementById('fill').style.width = (20 + Math.random() * 55) + "%";
-      document.getElementById('status').textContent = "Chill • " + (2.8 + Math.random()*4).toFixed(1) + " / 10";
-      alert("🌊 Conditions refreshed!");
+    let tideChartInstance = null;
+
+    // Fetch real tide data from NOAA API (Charleston Station: 8665530)
+    async function fetchTides() {
+      try {
+        const response = await fetch('https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?date=today&station=8665530&product=predictions&datum=MLLW&time_zone=lst_ldt&interval=h&units=english&format=json');
+        const data = await response.json();
+        
+        document.getElementById('tide-loading').style.display = 'none';
+        
+        const labels = data.predictions.map(p => {
+          let date = new Date(p.t);
+          return date.toLocaleTimeString([], {hour: 'numeric'});
+        });
+        const levels = data.predictions.map(p => parseFloat(p.v));
+
+        renderTideChart(labels, levels);
+      } catch (error) {
+        document.getElementById('tide-loading').innerText = "Could not load live tides. Showing offline forecast.";
+        console.error("NOAA API Error:", error);
+      }
     }
+
+    function renderTideChart(labels, data) {
+      const ctx = document.getElementById('tideChart').getContext('2d');
+      
+      // Gradient for the wave
+      let gradient = ctx.createLinearGradient(0, 0, 0, 200);
+      gradient.addColorStop(0, 'rgba(103, 232, 249, 0.8)');
+      gradient.addColorStop(1, 'rgba(103, 232, 249, 0.0)');
+
+      if (tideChartInstance) tideChartInstance.destroy();
+
+      tideChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Water Level (ft)',
+            data: data,
+            borderColor: '#67e8f9',
+            borderWidth: 3,
+            backgroundColor: gradient,
+            fill: true,
+            tension: 0.4, // Makes it a smooth wave
+            pointRadius: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { grid: { display: false }, ticks: { color: '#bae6fd', maxTicksLimit: 6 } },
+            y: { grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#bae6fd' } }
+          }
+        }
+      });
+    }
+
+    function refreshData() {
+      // 1. Randomize Crowd Level
+      const crowdScore = (2.8 + Math.random() * 6);
+      const fillPercentage = crowdScore * 10;
+      
+      document.getElementById('fill').style.width = fillPercentage + "%";
+      
+      let crowdStatus = "Chill";
+      if(crowdScore > 5) crowdStatus = "Busy";
+      if(crowdScore > 8) crowdStatus = "Packed";
+      
+      document.getElementById('status').textContent = `${crowdStatus} • ${crowdScore.toFixed(1)} / 10`;
+
+      // 2. Sync Traffic Animation with Crowd Level
+      const road = document.getElementById('road');
+      const trafficStatus = document.getElementById('traffic-status');
+      
+      if (crowdScore > 7) {
+        trafficStatus.textContent = "Heavy Delays 🛑";
+        trafficStatus.style.color = "#fb923c";
+        road.innerHTML = `
+          <div class="car speed-slow"></div>
+          <div class="car speed-slow" style="animation-delay: 1.5s"></div>
+          <div class="car speed-slow" style="animation-delay: 2.8s"></div>
+          <div class="car speed-slow" style="animation-delay: 4.2s"></div>
+        `;
+      } else {
+        trafficStatus.textContent = "Light & Flowing 🟢";
+        trafficStatus.style.color = "#fff";
+        road.innerHTML = `
+          <div class="car speed-fast"></div>
+          <div class="car speed-fast" style="animation-delay: 0.6s"></div>
+          <div class="car speed-fast" style="animation-delay: 1.4s"></div>
+        `;
+      }
+
+      // 3. Update Timestamp
+      document.getElementById('timestamp').textContent = "Updated • " + new Date().toLocaleTimeString();
+    }
+
+    // Initialize on load
+    fetchTides();
   </script>
 </body>
 </html>
