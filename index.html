@@ -222,63 +222,160 @@
       box-shadow: 0 0 20px rgba(0, 229, 255, 0.8);
     }
 
-    /* Bridge Traffic Animation */
-    .road-container {
-      height: 40px;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.08));
-      border: 1px solid rgba(255, 255, 255, 0.2);
+    /* Bridge Visualization */
+    .bridge-container {
+      background: linear-gradient(180deg, rgba(100, 100, 100, 0.4), rgba(80, 80, 80, 0.3));
+      border: 2px solid rgba(150, 150, 150, 0.6);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      position: relative;
+    }
+
+    .bridge-section {
+      background: linear-gradient(180deg, rgba(120, 120, 120, 0.5), rgba(100, 100, 100, 0.4));
       border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
       position: relative;
       overflow: hidden;
-      margin: 1.5rem 0;
+    }
+
+    .bridge-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .bridge-lanes {
+      position: relative;
+      height: 60px;
+      background: linear-gradient(180deg, rgba(150, 150, 150, 0.3), rgba(120, 120, 120, 0.2));
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .lane {
+      position: absolute;
+      width: 100%;
+      height: 28px;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.3);
       display: flex;
       align-items: center;
-      padding: 0 8px;
     }
 
-    .road-label {
-      position: absolute;
-      left: 12px;
-      font-size: 0.75rem;
-      color: #e6f7ff;
-      font-weight: 600;
-      text-transform: uppercase;
-      z-index: 3;
+    .lane:first-child {
+      top: 0;
     }
 
-    .cars-track {
-      position: relative;
-      width: 100%;
-      height: 20px;
-      margin-left: 60px;
+    .lane:last-child {
+      top: 32px;
+      border-bottom: none;
     }
 
+    /* Realistic car styling */
     .car {
       position: absolute;
-      top: 2px;
-      width: 12px;
-      height: 16px;
-      background: linear-gradient(135deg, #00e5ff, #4dd0e1);
-      border-radius: 2px;
-      box-shadow: 0 0 8px rgba(0, 229, 255, 0.8);
+      width: 36px;
+      height: 20px;
+      background: linear-gradient(135deg, #FF6B6B 0%, #FF8E72 50%, #FFD93D 100%);
+      border-radius: 4px;
+      box-shadow: 0 0 8px rgba(255, 107, 107, 0.6), inset -2px -2px 4px rgba(0, 0, 0, 0.3);
       opacity: 0.9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: #fff;
+      font-weight: bold;
+      position: relative;
     }
 
-    .car.slow {
-      background: linear-gradient(135deg, #ff9800, #ffb74d);
-      box-shadow: 0 0 8px rgba(255, 152, 0, 0.8);
+    /* Car windows */
+    .car::before {
+      content: '';
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: rgba(135, 206, 235, 0.8);
+      border-radius: 1px;
+      left: 6px;
+      top: 2px;
+    }
+
+    .car::after {
+      content: '';
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: rgba(135, 206, 235, 0.8);
+      border-radius: 1px;
+      right: 6px;
+      top: 2px;
+    }
+
+    /* Traffic light colors */
+    .car.light {
+      background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 50%, #81C784 100%);
+      box-shadow: 0 0 8px rgba(76, 175, 80, 0.6), inset -2px -2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .car.moderate {
+      background: linear-gradient(135deg, #FFC107 0%, #FFD54F 50%, #FFEB3B 100%);
+      box-shadow: 0 0 8px rgba(255, 193, 7, 0.6), inset -2px -2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .car.heavy {
+      background: linear-gradient(135deg, #FF9800 0%, #FFB74D 50%, #FFCC80 100%);
+      box-shadow: 0 0 8px rgba(255, 152, 0, 0.6), inset -2px -2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .car.congested {
+      background: linear-gradient(135deg, #F44336 0%, #EF5350 50%, #E57373 100%);
+      box-shadow: 0 0 8px rgba(244, 67, 54, 0.6), inset -2px -2px 4px rgba(0, 0, 0, 0.3);
     }
 
     @keyframes driveFast {
-      to { transform: translateX(calc(100vw + 50px)); }
+      to { transform: translateX(calc(100% + 40px)); }
     }
 
     @keyframes driveSlow {
-      to { transform: translateX(calc(100vw + 50px)); }
+      to { transform: translateX(calc(100% + 40px)); }
     }
 
-    .speed-fast { animation: driveFast 2.5s linear infinite; }
-    .speed-slow { animation: driveSlow 7s linear infinite; }
+    .car.fast {
+      animation: driveFast 3s linear infinite;
+    }
+
+    .car.slow {
+      animation: driveSlow 8s linear infinite;
+    }
+
+    .bridge-direction {
+      font-size: 0.8rem;
+      color: #e6f7ff;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
+    .traffic-legend {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.5rem;
+      margin-top: 1rem;
+      font-size: 0.75rem;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 2px;
+    }
 
     /* Tide Chart */
     .tide-container {
@@ -396,6 +493,12 @@
         top: 5%;
         right: 10%;
       }
+
+      .car {
+        width: 28px;
+        height: 16px;
+        font-size: 8px;
+      }
     }
   </style>
 </head>
@@ -418,26 +521,49 @@
 
     <!-- Bridge Traffic Card -->
     <div class="card">
-      <div class="card-header">🌉 Bridge Traffic (Coming In)</div>
-      <p id="bridge-status" class="status-text">Light & Flowing</p>
-      <p id="bridge-count" class="status-subtext">~45 vehicles/min</p>
+      <div class="card-header">🌉 Live Bridge Traffic</div>
       
-      <div class="road-container">
-        <span class="road-label">→</span>
-        <div class="cars-track" id="bridge-track"></div>
-      </div>
-    </div>
+      <div class="bridge-container">
+        <!-- Incoming Lane -->
+        <div class="bridge-section">
+          <div class="bridge-direction">→ Incoming Traffic (To Beach)</div>
+          <div class="bridge-lanes">
+            <div class="lane" id="incoming-lane-1"></div>
+            <div class="lane" id="incoming-lane-2"></div>
+          </div>
+        </div>
 
-    <!-- Beach Traffic Card -->
-    <div class="card">
-      <div class="card-header">🅿️ Beach Lot Traffic (Departing)</div>
-      <p id="lot-status" class="status-text">Light</p>
-      <p id="lot-count" class="status-subtext">~32 vehicles/min</p>
-      
-      <div class="road-container">
-        <span class="road-label">←</span>
-        <div class="cars-track" id="lot-track"></div>
+        <!-- Outgoing Lane -->
+        <div class="bridge-section">
+          <div class="bridge-direction">← Outgoing Traffic (Leaving Beach)</div>
+          <div class="bridge-lanes">
+            <div class="lane" id="outgoing-lane-1"></div>
+            <div class="lane" id="outgoing-lane-2"></div>
+          </div>
+        </div>
+
+        <div class="traffic-legend">
+          <div class="legend-item">
+            <div class="legend-dot" style="background: #4CAF50;"></div>
+            <span>Light</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background: #FFC107;"></div>
+            <span>Moderate</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background: #FF9800;"></div>
+            <span>Heavy</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background: #F44336;"></div>
+            <span>Congested</span>
+          </div>
+        </div>
       </div>
+
+      <p id="bridge-status" class="status-text" style="font-size: 1.2rem; margin-top: 1rem;">Light & Flowing 🟢</p>
+      <p id="bridge-count" class="status-subtext">~45 vehicles/min</p>
     </div>
 
     <!-- Tide Forecast Card -->
@@ -660,83 +786,80 @@
       });
     }
 
-    function createTrafficCars(count, speed = 'fast') {
-      const track = document.createElement('div');
-      const spacing = 100 / count;
-      
-      for (let i = 0; i < count; i++) {
-        const car = document.createElement('div');
-        car.className = `car ${speed === 'fast' ? '' : 'slow'}`;
-        car.style.left = (i * spacing) + '%';
-        car.style.animationDelay = (i * 0.5) + 's';
-        car.style.animationDuration = (speed === 'fast' ? 2.5 : 7) + 's';
-        car.style.animationName = speed === 'fast' ? 'driveFast' : 'driveSlow';
-        track.appendChild(car);
-      }
-      
-      return track;
+    function createBridgeCar(color, speed) {
+      const car = document.createElement('div');
+      car.className = `car ${color} ${speed}`;
+      car.style.left = Math.random() * 80 + '%';
+      car.style.animationDelay = Math.random() * 3 + 's';
+      return car;
     }
 
-    function updateTrafficFlow(crowdScore) {
-      const bridgeTrack = document.getElementById('bridge-track');
-      const lotTrack = document.getElementById('lot-track');
+    function updateBridgeTraffic(crowdScore) {
+      const incomingLane1 = document.getElementById('incoming-lane-1');
+      const incomingLane2 = document.getElementById('incoming-lane-2');
+      const outgoingLane1 = document.getElementById('outgoing-lane-1');
+      const outgoingLane2 = document.getElementById('outgoing-lane-2');
       const bridgeStatus = document.getElementById('bridge-status');
-      const lotStatus = document.getElementById('lot-status');
       const bridgeCount = document.getElementById('bridge-count');
-      const lotCount = document.getElementById('lot-count');
 
-      // Bridge traffic increases with crowd
-      let bridgeCars, bridgeFlowStatus, bridgeFlowRate;
+      // Clear lanes
+      [incomingLane1, incomingLane2, outgoingLane1, outgoingLane2].forEach(lane => lane.innerHTML = '');
+
+      // Determine traffic state based on crowd score
+      let state, incomingCars, outgoingCars, speed, statusText, statusEmoji, vehicleRate;
+      
       if (crowdScore < 3) {
-        bridgeCars = 3;
-        bridgeFlowStatus = "Light & Flowing 🟢";
-        bridgeFlowRate = "~30 vehicles/min";
+        state = 'light';
+        incomingCars = 3;
+        outgoingCars = 1;
+        speed = 'fast';
+        statusText = 'Light & Flowing';
+        statusEmoji = '🟢';
+        vehicleRate = '~30 vehicles/min';
       } else if (crowdScore < 5) {
-        bridgeCars = 4;
-        bridgeFlowStatus = "Moderate Flow 🟡";
-        bridgeFlowRate = "~45 vehicles/min";
+        state = 'moderate';
+        incomingCars = 5;
+        outgoingCars = 2;
+        speed = 'fast';
+        statusText = 'Moderate Flow';
+        statusEmoji = '🟡';
+        vehicleRate = '~50 vehicles/min';
       } else if (crowdScore < 7) {
-        bridgeCars = 5;
-        bridgeFlowStatus = "Heavy Traffic 🟠";
-        bridgeFlowRate = "~65 vehicles/min";
+        state = 'heavy';
+        incomingCars = 7;
+        outgoingCars = 4;
+        speed = 'slow';
+        statusText = 'Heavy Traffic';
+        statusEmoji = '🟠';
+        vehicleRate = '~70 vehicles/min';
       } else {
-        bridgeCars = 6;
-        bridgeFlowStatus = "Congested 🔴";
-        bridgeFlowRate = "~85 vehicles/min";
+        state = 'congested';
+        incomingCars = 9;
+        outgoingCars = 6;
+        speed = 'slow';
+        statusText = 'Congested';
+        statusEmoji = '🔴';
+        vehicleRate = '~90 vehicles/min';
       }
 
-      // Lot traffic (departing) increases slightly as crowd builds
-      let lotCars, lotFlowStatus, lotFlowRate;
-      if (crowdScore < 3) {
-        lotCars = 2;
-        lotFlowStatus = "Light";
-        lotFlowRate = "~20 vehicles/min";
-      } else if (crowdScore < 6) {
-        lotCars = 3;
-        lotFlowStatus = "Steady";
-        lotFlowRate = "~35 vehicles/min";
-      } else {
-        lotCars = 4;
-        lotFlowStatus = "Heavy";
-        lotFlowRate = "~50 vehicles/min";
+      // Add incoming traffic (to beach)
+      for (let i = 0; i < incomingCars; i++) {
+        incomingLane1.appendChild(createBridgeCar(state, speed));
+        if (i % 2 === 1) {
+          incomingLane2.appendChild(createBridgeCar(state, speed));
+        }
       }
 
-      bridgeTrack.innerHTML = '';
-      lotTrack.innerHTML = '';
-      
-      const bridgeFlow = crowdScore > 6 ? 'slow' : 'fast';
-      const lotFlow = crowdScore > 6 ? 'slow' : 'fast';
-      
-      const bridgeCarsHtml = createTrafficCars(bridgeCars, bridgeFlow);
-      const lotCarsHtml = createTrafficCars(lotCars, lotFlow);
-      
-      bridgeTrack.appendChild(bridgeCarsHtml);
-      lotTrack.appendChild(lotCarsHtml);
+      // Add outgoing traffic (leaving beach)
+      for (let i = 0; i < outgoingCars; i++) {
+        outgoingLane1.appendChild(createBridgeCar(state, speed));
+        if (i % 2 === 1) {
+          outgoingLane2.appendChild(createBridgeCar(state, speed));
+        }
+      }
 
-      bridgeStatus.textContent = bridgeFlowStatus;
-      bridgeCount.textContent = bridgeFlowRate;
-      lotStatus.textContent = lotFlowStatus;
-      lotCount.textContent = lotFlowRate;
+      bridgeStatus.textContent = `${statusText} ${statusEmoji}`;
+      bridgeCount.textContent = vehicleRate;
     }
 
     function refreshData() {
@@ -764,7 +887,7 @@
       document.getElementById('status').textContent = `${crowdStatus} • ${crowdScore.toFixed(1)} / 10`;
       document.getElementById('crowdDesc').textContent = crowdDesc;
 
-      updateTrafficFlow(crowdScore);
+      updateBridgeTraffic(crowdScore);
 
       // Update timestamp
       document.getElementById('timestamp').textContent = "Updated • " + new Date().toLocaleTimeString();
