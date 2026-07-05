@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Folly Flow • Live Beach Meter</title>
+  <title>Folly Flow • Live Beach Conditions</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&display=swap');
 
     body {
       font-family: 'Inter', sans-serif;
@@ -22,15 +22,15 @@
       bottom: 0;
       left: 0;
       width: 100%;
-      height: 50%;
+      height: 55%;
       background: linear-gradient(transparent, #0ea5e9);
       z-index: 1;
-      animation: wave 8s linear infinite;
+      animation: wave 10s linear infinite;
     }
 
     @keyframes wave {
       0% { transform: translateY(0); }
-      50% { transform: translateY(15px); }
+      50% { transform: translateY(20px); }
       100% { transform: translateY(0); }
     }
 
@@ -38,79 +38,55 @@
       position: relative;
       z-index: 2;
       max-width: 560px;
-      margin: 40px auto;
+      margin: 30px auto;
       padding: 2rem;
       text-align: center;
     }
 
     h1 {
       font-family: 'Playfair Display', serif;
-      font-size: 3.8rem;
-      background: linear-gradient(90deg, #67e8f9, #ffffff, #a5f3fc);
+      font-size: 3.6rem;
+      background: linear-gradient(90deg, #67e8f9, #ffffff);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      margin-bottom: 0.2rem;
-      text-shadow: 0 0 30px rgba(103, 232, 249, 0.6);
     }
 
-    .tagline {
-      color: #bae6fd;
-      font-size: 1.3rem;
-      margin-bottom: 2.5rem;
-    }
+    .tagline { color: #bae6fd; font-size: 1.25rem; margin: 0.5rem 0 2rem; }
 
-    .meter-container {
-      background: rgba(255,255,255,0.12);
+    .card {
+      background: rgba(255,255,255,0.1);
       backdrop-filter: blur(16px);
-      border: 1px solid rgba(255,255,255,0.3);
-      border-radius: 28px;
-      padding: 2rem;
-      margin: 2rem 0;
-      box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+      border: 1px solid rgba(103,232,249,0.3);
+      border-radius: 24px;
+      padding: 1.8rem;
+      margin: 1.5rem 0;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.4);
     }
 
     .meter {
-      height: 38px;
-      background: #0f2a4a;
+      height: 34px;
+      background: #112233;
       border-radius: 9999px;
       overflow: hidden;
-      margin: 1.5rem 0;
+      margin: 1rem 0;
     }
     .fill {
       height: 100%;
       width: 38%;
-      background: linear-gradient(90deg, #22d3ee, #67e8f9, #c4f1fd);
+      background: linear-gradient(90deg, #22d3ee, #67e8f9);
       transition: width 1.8s ease;
-      box-shadow: 0 0 35px #67e8f9;
-    }
-
-    .status {
-      font-size: 2.3rem;
-      font-weight: 700;
-      color: #67e8f9;
-      margin: 1rem 0;
     }
 
     button {
       background: linear-gradient(90deg, #22d3ee, #67e8f9);
       color: #0a1428;
       border: none;
-      padding: 18px 60px;
-      font-size: 1.25rem;
+      padding: 16px 50px;
+      font-size: 1.2rem;
       font-weight: 700;
       border-radius: 9999px;
       cursor: pointer;
-      box-shadow: 0 15px 40px rgba(103,232,249,0.5);
-      transition: all 0.3s;
-    }
-    button:hover {
-      transform: scale(1.05);
-    }
-
-    .footer {
-      margin-top: 4rem;
-      color: #94a3b8;
-      font-size: 1rem;
+      margin: 1rem 0;
     }
   </style>
 </head>
@@ -119,32 +95,36 @@
 
   <div class="container">
     <h1>Folly Flow</h1>
-    <p class="tagline">Real-time Crowd & Traffic • Folly Beach, SC 🌊</p>
+    <p class="tagline">Live Beach Conditions • Folly Beach, SC 🌊</p>
 
-    <div class="meter-container">
-      <p style="margin-bottom:8px; color:#bae6fd;">Current Crowd Level</p>
-      <div class="meter"><div class="fill" id="fill"></div></div>
-      <div class="status" id="status">Chill Mode • 4.2 / 10</div>
+    <div class="card">
+      <p><strong>Current Crowd Level</strong></p>
+      <div class="meter"><div class="fill" id="fill" style="width:38%"></div></div>
+      <p id="status" style="font-size:1.9rem; font-weight:700; color:#67e8f9;">Chill • 3.8 / 10</p>
     </div>
 
-    <div style="background:rgba(255,255,255,0.1); border-radius:24px; padding:2rem; margin:2rem 0;">
-      <strong style="color:#67e8f9;">🚗 Traffic on Folly Road</strong><br><br>
-      <strong style="font-size:1.3rem;">Light & Flowing</strong><br>
-      No delays • Post-holiday crowd has left
+    <div class="card">
+      <p><strong>🚗 Folly Road Traffic</strong></p>
+      <p style="font-size:1.4rem; margin:0.8rem 0;">Light &amp; Flowing</p>
+      <p>No major delays right now</p>
     </div>
 
-    <button onclick="refresh()">⟳ Refresh Conditions</button>
-
-    <div class="footer">
-      Updated just now • July 5, 2026
+    <div class="card">
+      <p><strong>🌊 Tide Now</strong></p>
+      <p style="font-size:1.5rem; margin:0.5rem 0;">High Tide at 6:42 PM (4.8 ft)</p>
+      <p>Low Tide at 1:15 AM (0.9 ft)</p>
     </div>
+
+    <button onclick="refresh()">⟳ Refresh All Conditions</button>
+
+    <p style="margin-top:3rem; color:#94a3b8;">Updated • July 5, 2026 • 3:43 PM</p>
   </div>
 
   <script>
     function refresh() {
-      document.getElementById('fill').style.width = (25 + Math.random() * 50) + "%";
-      document.getElementById('status').textContent = "Chill Mode • " + (3.0 + Math.random()*4).toFixed(1) + " / 10";
-      alert("🌊 Refreshed — Folly is looking good right now!");
+      document.getElementById('fill').style.width = (20 + Math.random() * 55) + "%";
+      document.getElementById('status').textContent = "Chill • " + (2.8 + Math.random()*4).toFixed(1) + " / 10";
+      alert("🌊 Conditions refreshed!");
     }
   </script>
 </body>
