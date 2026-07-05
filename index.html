@@ -17,50 +17,81 @@
 
     body {
       font-family: 'Inter', sans-serif;
-      background: linear-gradient(135deg, #0a1428, #1e3a5f, #2a6b8a);
       color: #fff;
       min-height: 100vh;
       margin: 0;
       position: relative;
       overflow-x: hidden;
+      background: linear-gradient(180deg, #87CEEB 0%, #4da6e6 25%, #1e90ff 50%, #0066cc 75%, #003d99 100%);
     }
 
+    /* Full background ocean effect */
     .ocean-bg {
       position: fixed;
-      bottom: 0;
+      top: 0;
       left: 0;
       width: 100%;
-      height: 60%;
-      z-index: 1;
-      background: linear-gradient(180deg, transparent 0%, rgba(14, 165, 233, 0.15) 40%, rgba(6, 182, 212, 0.3) 100%);
+      height: 100%;
+      z-index: 0;
       overflow: hidden;
     }
 
-    /* Multiple wave layers for depth */
+    /* Sun sparkle effect */
+    .sun {
+      position: absolute;
+      top: 10%;
+      right: 15%;
+      width: 80px;
+      height: 80px;
+      background: radial-gradient(circle, #ffeb3b, rgba(255, 235, 59, 0.3));
+      border-radius: 50%;
+      box-shadow: 0 0 80px rgba(255, 235, 59, 0.6), 0 0 150px rgba(255, 235, 59, 0.3);
+      z-index: 1;
+      animation: sunGlow 4s ease-in-out infinite;
+    }
+
+    @keyframes sunGlow {
+      0%, 100% { box-shadow: 0 0 80px rgba(255, 235, 59, 0.6), 0 0 150px rgba(255, 235, 59, 0.3); }
+      50% { box-shadow: 0 0 100px rgba(255, 235, 59, 0.8), 0 0 180px rgba(255, 235, 59, 0.5); }
+    }
+
+    /* Shimmer particles in water */
+    .shimmer {
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 50%;
+      opacity: 0;
+      animation: shimmerFloat 6s infinite ease-in-out;
+    }
+
+    @keyframes shimmerFloat {
+      0% {
+        opacity: 0;
+        transform: translateY(0px);
+      }
+      20% {
+        opacity: 1;
+      }
+      80% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-800px);
+      }
+    }
+
+    /* Multiple wave layers */
     svg.wave {
       position: absolute;
       bottom: 0;
       left: 0;
       width: 100%;
-      height: 100%;
+      height: auto;
     }
 
-    .wave-fill {
-      fill: url(#waveGradient);
-      opacity: 0.8;
-    }
-
-    .wave-fill-deep {
-      fill: url(#waveGradientDeep);
-      opacity: 0.6;
-    }
-
-    .wave-fill-deeper {
-      fill: url(#waveGradientDeeper);
-      opacity: 0.4;
-    }
-
-    /* Wave animations at different speeds for depth effect */
     @keyframes wave1 {
       0% { transform: translateX(0); }
       100% { transform: translateX(100%); }
@@ -76,21 +107,30 @@
       100% { transform: translateX(100%); }
     }
 
+    @keyframes wave4 {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-100%); }
+    }
+
+    .wave-fastest {
+      animation: wave1 6s linear infinite;
+    }
+
     .wave-fast {
-      animation: wave1 8s linear infinite;
+      animation: wave2 8s linear infinite;
     }
 
     .wave-medium {
-      animation: wave2 12s linear infinite;
+      animation: wave3 12s linear infinite;
     }
 
     .wave-slow {
-      animation: wave3 16s linear infinite;
+      animation: wave4 16s linear infinite;
     }
 
     .container {
       position: relative;
-      z-index: 2;
+      z-index: 10;
       max-width: 680px;
       margin: 30px auto;
       padding: 2rem 1.5rem;
@@ -101,33 +141,35 @@
       font-family: 'Playfair Display', serif;
       font-size: 3.6rem;
       margin-bottom: 0;
-      background: linear-gradient(90deg, #67e8f9, #ffffff);
+      background: linear-gradient(90deg, #ffffff, #e6f7ff);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
     }
 
     .tagline { 
-      color: #bae6fd; 
+      color: #e6f7ff; 
       font-size: 1.25rem; 
       margin: 0.5rem 0 2rem;
+      text-shadow: 0 1px 5px rgba(0, 0, 0, 0.3);
     }
 
     .card {
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(103, 232, 249, 0.3);
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.25);
       border-radius: 24px;
       padding: 2rem;
       margin: 1.5rem 0;
-      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
       text-align: left;
     }
 
     .card-header {
       font-weight: 600;
-      color: #bae6fd;
+      color: #e6f7ff;
       margin-bottom: 1.5rem;
       text-transform: uppercase;
       letter-spacing: 1px;
@@ -142,8 +184,8 @@
     }
 
     .stat-box {
-      background: rgba(103, 232, 249, 0.1);
-      border: 1px solid rgba(103, 232, 249, 0.3);
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 12px;
       padding: 1rem;
       text-align: center;
@@ -152,19 +194,19 @@
     .stat-value {
       font-size: 2.4rem;
       font-weight: 700;
-      color: #67e8f9;
+      color: #fff;
       margin: 0;
     }
 
     .stat-label {
       font-size: 0.85rem;
-      color: #bae6fd;
+      color: #e6f7ff;
       margin-top: 0.5rem;
     }
 
     .meter {
       height: 28px;
-      background: rgba(17, 34, 51, 0.8);
+      background: rgba(0, 0, 0, 0.3);
       border-radius: 9999px;
       overflow: hidden;
       margin: 1.5rem 0;
@@ -174,17 +216,17 @@
     .fill {
       height: 100%;
       width: 38%;
-      background: linear-gradient(90deg, #22d3ee, #67e8f9);
+      background: linear-gradient(90deg, #00e5ff, #4dd0e1);
       transition: width 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
       border-radius: 9999px;
-      box-shadow: 0 0 15px rgba(103, 232, 249, 0.6);
+      box-shadow: 0 0 20px rgba(0, 229, 255, 0.8);
     }
 
     /* Bridge Traffic Animation */
     .road-container {
       height: 40px;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
-      border: 1px solid rgba(103, 232, 249, 0.2);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.08));
+      border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 8px;
       position: relative;
       overflow: hidden;
@@ -198,7 +240,7 @@
       position: absolute;
       left: 12px;
       font-size: 0.75rem;
-      color: #bae6fd;
+      color: #e6f7ff;
       font-weight: 600;
       text-transform: uppercase;
       z-index: 3;
@@ -216,15 +258,15 @@
       top: 2px;
       width: 12px;
       height: 16px;
-      background: linear-gradient(135deg, #22d3ee, #67e8f9);
+      background: linear-gradient(135deg, #00e5ff, #4dd0e1);
       border-radius: 2px;
-      box-shadow: 0 0 8px rgba(103, 232, 249, 0.8);
+      box-shadow: 0 0 8px rgba(0, 229, 255, 0.8);
       opacity: 0.9;
     }
 
     .car.slow {
-      background: linear-gradient(135deg, #fb923c, #f97316);
-      box-shadow: 0 0 8px rgba(249, 115, 22, 0.8);
+      background: linear-gradient(135deg, #ff9800, #ffb74d);
+      box-shadow: 0 0 8px rgba(255, 152, 0, 0.8);
     }
 
     @keyframes driveFast {
@@ -255,27 +297,27 @@
     }
 
     .tide-stat {
-      background: rgba(103, 232, 249, 0.1);
+      background: rgba(255, 255, 255, 0.1);
       padding: 0.8rem;
       border-radius: 8px;
-      border-left: 3px solid #67e8f9;
+      border-left: 3px solid #00e5ff;
     }
 
     .tide-stat-value {
       font-weight: 700;
-      color: #67e8f9;
+      color: #fff;
       font-size: 1.3rem;
     }
 
     .tide-stat-label {
-      color: #bae6fd;
+      color: #e6f7ff;
       font-size: 0.8rem;
       margin-top: 0.3rem;
     }
 
     button {
-      background: linear-gradient(90deg, #22d3ee, #67e8f9);
-      color: #0a1428;
+      background: linear-gradient(90deg, #00e5ff, #4dd0e1);
+      color: #003d99;
       border: none;
       padding: 16px 50px;
       font-size: 1.1rem;
@@ -284,12 +326,12 @@
       cursor: pointer;
       margin: 1.5rem 0;
       transition: all 0.3s;
-      box-shadow: 0 4px 15px rgba(103, 232, 249, 0.4);
+      box-shadow: 0 4px 15px rgba(0, 229, 255, 0.4);
     }
 
     button:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(103, 232, 249, 0.6);
+      box-shadow: 0 6px 25px rgba(0, 229, 255, 0.6);
     }
 
     button:active {
@@ -305,25 +347,25 @@
 
     .status-subtext {
       font-size: 0.95rem;
-      color: #bae6fd;
+      color: #e6f7ff;
       margin: 0.5rem 0 0 0;
     }
 
     .timestamp {
       margin-top: 2rem;
-      color: #94a3b8;
+      color: rgba(255, 255, 255, 0.8);
       font-size: 0.85rem;
     }
 
     .loading {
       text-align: center;
-      color: #94a3b8;
+      color: rgba(255, 255, 255, 0.8);
       font-size: 0.9rem;
       padding: 1rem;
     }
 
     .error {
-      color: #fb923c;
+      color: #ff9800;
     }
 
     @media (max-width: 600px) {
@@ -348,14 +390,19 @@
         padding: 1.5rem;
       }
 
-      .ocean-bg {
-        height: 50%;
+      .sun {
+        width: 60px;
+        height: 60px;
+        top: 5%;
+        right: 10%;
       }
     }
   </style>
 </head>
 <body>
-  <div class="ocean-bg" id="oceanBg"></div>
+  <div class="ocean-bg" id="oceanBg">
+    <div class="sun"></div>
+  </div>
 
   <div class="container">
     <h1>Folly Flow</h1>
@@ -426,16 +473,34 @@
       packed: "Beach is packed! Consider coming back later 🚫"
     };
 
+    // Create shimmer particles
+    function createShimmers() {
+      const oceanBg = document.getElementById('oceanBg');
+      for (let i = 0; i < 30; i++) {
+        const shimmer = document.createElement('div');
+        shimmer.className = 'shimmer';
+        shimmer.style.left = Math.random() * 100 + '%';
+        shimmer.style.bottom = Math.random() * 60 + '%';
+        shimmer.style.animationDelay = Math.random() * 6 + 's';
+        shimmer.style.animationDuration = (4 + Math.random() * 4) + 's';
+        oceanBg.appendChild(shimmer);
+      }
+    }
+
     // Create animated ocean waves
     function createOceanWaves() {
       const oceanBg = document.getElementById('oceanBg');
-      oceanBg.innerHTML = '';
+      
+      // Remove old waves but keep sun and shimmers
+      const oldWaves = oceanBg.querySelectorAll('svg.wave');
+      oldWaves.forEach(w => w.remove());
 
       // Create SVG waves with different speeds for depth effect
       const waveConfigs = [
-        { class: 'wave-fast', yOffset: 0, amplitude: 30, frequency: 0.015 },
-        { class: 'wave-medium', yOffset: 40, amplitude: 25, frequency: 0.012 },
-        { class: 'wave-slow', yOffset: 70, amplitude: 20, frequency: 0.01 }
+        { class: 'wave-fastest', yOffset: 0, amplitude: 35, frequency: 0.018, opacity: 0.8 },
+        { class: 'wave-fast', yOffset: 35, amplitude: 30, frequency: 0.015, opacity: 0.7 },
+        { class: 'wave-medium', yOffset: 65, amplitude: 25, frequency: 0.012, opacity: 0.6 },
+        { class: 'wave-slow', yOffset: 90, amplitude: 20, frequency: 0.01, opacity: 0.5 }
       ];
 
       waveConfigs.forEach((config, index) => {
@@ -443,7 +508,8 @@
         svg.setAttribute('viewBox', '0 0 1200 120');
         svg.setAttribute('preserveAspectRatio', 'none');
         svg.setAttribute('class', `wave ${config.class}`);
-        svg.style.height = '100%';
+        svg.style.height = 'auto';
+        svg.style.minHeight = '100px';
 
         const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
         
@@ -456,10 +522,12 @@
         gradient.setAttribute('x2', '0%');
         gradient.setAttribute('y2', '100%');
 
+        // Beautiful ocean colors with sun reflection
         const stops = [
-          { offset: '0%', color: `rgba(34, 211, 238, ${0.4 - index * 0.1})` },
-          { offset: '50%', color: `rgba(6, 182, 212, ${0.3 - index * 0.08})` },
-          { offset: '100%', color: `rgba(3, 102, 214, ${0.2 - index * 0.05})` }
+          { offset: '0%', color: `rgba(100, 200, 255, ${config.opacity})` },
+          { offset: '40%', color: `rgba(50, 180, 230, ${config.opacity * 0.9})` },
+          { offset: '80%', color: `rgba(30, 120, 200, ${config.opacity * 0.7})` },
+          { offset: '100%', color: `rgba(10, 80, 150, ${config.opacity * 0.5})` }
         ];
 
         stops.forEach(stop => {
@@ -474,7 +542,7 @@
 
         // Create wave path with sine wave pattern
         let pathData = 'M0,60';
-        for (let x = 0; x <= 1200; x += 30) {
+        for (let x = 0; x <= 1200; x += 25) {
           const y = 60 + Math.sin(x * config.frequency) * config.amplitude;
           pathData += ` L${x},${y}`;
         }
@@ -483,7 +551,6 @@
         const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
         path.setAttribute('d', pathData);
         path.setAttribute('fill', `url(#${gradientId})`);
-        path.setAttribute('opacity', '0.7');
 
         svg.appendChild(path);
         oceanBg.appendChild(svg);
@@ -548,9 +615,9 @@
       const ctx = document.getElementById('tideChart').getContext('2d');
       
       let gradient = ctx.createLinearGradient(0, 0, 0, 250);
-      gradient.addColorStop(0, 'rgba(103, 232, 249, 0.6)');
-      gradient.addColorStop(0.5, 'rgba(103, 232, 249, 0.3)');
-      gradient.addColorStop(1, 'rgba(103, 232, 249, 0.0)');
+      gradient.addColorStop(0, 'rgba(0, 229, 255, 0.6)');
+      gradient.addColorStop(0.5, 'rgba(77, 208, 225, 0.3)');
+      gradient.addColorStop(1, 'rgba(0, 100, 200, 0.1)');
 
       if (tideChartInstance) tideChartInstance.destroy();
 
@@ -561,7 +628,7 @@
           datasets: [{
             label: 'Water Level (ft)',
             data: data,
-            borderColor: '#67e8f9',
+            borderColor: '#00e5ff',
             borderWidth: 3,
             backgroundColor: gradient,
             fill: true,
@@ -582,11 +649,11 @@
           scales: {
             x: { 
               grid: { display: false }, 
-              ticks: { color: '#bae6fd', maxTicksLimit: 6, font: { size: 11 } } 
+              ticks: { color: '#e6f7ff', maxTicksLimit: 6, font: { size: 11 } } 
             },
             y: { 
               grid: { color: 'rgba(255, 255, 255, 0.1)' }, 
-              ticks: { color: '#bae6fd', font: { size: 11 } } 
+              ticks: { color: '#e6f7ff', font: { size: 11 } } 
             }
           }
         }
@@ -705,6 +772,7 @@
 
     // Initialize on load
     window.addEventListener('load', () => {
+      createShimmers();
       createOceanWaves();
       fetchTides();
       refreshData();
