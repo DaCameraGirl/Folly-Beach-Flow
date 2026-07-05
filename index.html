@@ -377,6 +377,33 @@
       border-radius: 2px;
     }
 
+    .traffic-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 1rem 0;
+      font-size: 0.85rem;
+    }
+
+    .traffic-stat-item {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 0.8rem;
+      border-radius: 8px;
+      border-left: 3px solid #00e5ff;
+    }
+
+    .traffic-stat-value {
+      font-weight: 700;
+      color: #fff;
+      font-size: 1.1rem;
+    }
+
+    .traffic-stat-label {
+      color: #e6f7ff;
+      font-size: 0.75rem;
+      margin-top: 0.3rem;
+    }
+
     /* Tide Chart */
     .tide-container {
       position: relative;
@@ -542,6 +569,18 @@
           </div>
         </div>
 
+        <!-- Traffic Stats -->
+        <div class="traffic-stats">
+          <div class="traffic-stat-item">
+            <div class="traffic-stat-value" id="incoming-count">15</div>
+            <div class="traffic-stat-label">Cars Incoming</div>
+          </div>
+          <div class="traffic-stat-item">
+            <div class="traffic-stat-value" id="outgoing-count">6</div>
+            <div class="traffic-stat-label">Cars Outgoing</div>
+          </div>
+        </div>
+
         <div class="traffic-legend">
           <div class="legend-item">
             <div class="legend-dot" style="background: #4CAF50;"></div>
@@ -563,7 +602,7 @@
       </div>
 
       <p id="bridge-status" class="status-text" style="font-size: 1.2rem; margin-top: 1rem;">Light & Flowing 🟢</p>
-      <p id="bridge-count" class="status-subtext">~45 vehicles/min</p>
+      <p id="bridge-count" class="status-subtext">~45 vehicles/min total</p>
     </div>
 
     <!-- Tide Forecast Card -->
@@ -597,6 +636,50 @@
       moderate: "Getting a bit busier, but still plenty of space 🌊",
       busy: "It's getting crowded! Parking might be tight 🏄",
       packed: "Beach is packed! Consider coming back later 🚫"
+    };
+
+    // Traffic configurations - perfectly aligned with vehicles/min
+    const TRAFFIC_CONFIG = {
+      light: {
+        incomingCars: 6,
+        outgoingCars: 2,
+        incomingRate: 30,
+        outgoingRate: 10,
+        speed: 'fast',
+        statusText: 'Light & Flowing',
+        statusEmoji: '🟢',
+        color: 'light'
+      },
+      moderate: {
+        incomingCars: 10,
+        outgoingCars: 4,
+        incomingRate: 50,
+        outgoingRate: 18,
+        speed: 'fast',
+        statusText: 'Moderate Flow',
+        statusEmoji: '🟡',
+        color: 'moderate'
+      },
+      heavy: {
+        incomingCars: 14,
+        outgoingCars: 8,
+        incomingRate: 65,
+        outgoingRate: 35,
+        speed: 'slow',
+        statusText: 'Heavy Traffic',
+        statusEmoji: '🟠',
+        color: 'heavy'
+      },
+      congested: {
+        incomingCars: 18,
+        outgoingCars: 12,
+        incomingRate: 85,
+        outgoingRate: 50,
+        speed: 'slow',
+        statusText: 'Congested',
+        statusEmoji: '🔴',
+        color: 'congested'
+      }
     };
 
     // Create shimmer particles
@@ -801,65 +884,46 @@
       const outgoingLane2 = document.getElementById('outgoing-lane-2');
       const bridgeStatus = document.getElementById('bridge-status');
       const bridgeCount = document.getElementById('bridge-count');
+      const incomingCountEl = document.getElementById('incoming-count');
+      const outgoingCountEl = document.getElementById('outgoing-count');
 
       // Clear lanes
       [incomingLane1, incomingLane2, outgoingLane1, outgoingLane2].forEach(lane => lane.innerHTML = '');
 
       // Determine traffic state based on crowd score
-      let state, incomingCars, outgoingCars, speed, statusText, statusEmoji, vehicleRate;
+      let config;
       
       if (crowdScore < 3) {
-        state = 'light';
-        incomingCars = 3;
-        outgoingCars = 1;
-        speed = 'fast';
-        statusText = 'Light & Flowing';
-        statusEmoji = '🟢';
-        vehicleRate = '~30 vehicles/min';
+        config = TRAFFIC_CONFIG.light;
       } else if (crowdScore < 5) {
-        state = 'moderate';
-        incomingCars = 5;
-        outgoingCars = 2;
-        speed = 'fast';
-        statusText = 'Moderate Flow';
-        statusEmoji = '🟡';
-        vehicleRate = '~50 vehicles/min';
+        config = TRAFFIC_CONFIG.moderate;
       } else if (crowdScore < 7) {
-        state = 'heavy';
-        incomingCars = 7;
-        outgoingCars = 4;
-        speed = 'slow';
-        statusText = 'Heavy Traffic';
-        statusEmoji = '🟠';
-        vehicleRate = '~70 vehicles/min';
+        config = TRAFFIC_CONFIG.heavy;
       } else {
-        state = 'congested';
-        incomingCars = 9;
-        outgoingCars = 6;
-        speed = 'slow';
-        statusText = 'Congested';
-        statusEmoji = '🔴';
-        vehicleRate = '~90 vehicles/min';
+        config = TRAFFIC_CONFIG.congested;
       }
 
       // Add incoming traffic (to beach)
-      for (let i = 0; i < incomingCars; i++) {
-        incomingLane1.appendChild(createBridgeCar(state, speed));
+      for (let i = 0; i < config.incomingCars; i++) {
+        incomingLane1.appendChild(createBridgeCar(config.color, config.speed));
         if (i % 2 === 1) {
-          incomingLane2.appendChild(createBridgeCar(state, speed));
+          incomingLane2.appendChild(createBridgeCar(config.color, config.speed));
         }
       }
 
       // Add outgoing traffic (leaving beach)
-      for (let i = 0; i < outgoingCars; i++) {
-        outgoingLane1.appendChild(createBridgeCar(state, speed));
+      for (let i = 0; i < config.outgoingCars; i++) {
+        outgoingLane1.appendChild(createBridgeCar(config.color, config.speed));
         if (i % 2 === 1) {
-          outgoingLane2.appendChild(createBridgeCar(state, speed));
+          outgoingLane2.appendChild(createBridgeCar(config.color, config.speed));
         }
       }
 
-      bridgeStatus.textContent = `${statusText} ${statusEmoji}`;
-      bridgeCount.textContent = vehicleRate;
+      const totalVehicles = config.incomingRate + config.outgoingRate;
+      bridgeStatus.textContent = `${config.statusText} ${config.statusEmoji}`;
+      bridgeCount.textContent = `~${totalVehicles} vehicles/min total`;
+      incomingCountEl.textContent = config.incomingCars;
+      outgoingCountEl.textContent = config.outgoingCars;
     }
 
     function refreshData() {
