@@ -480,6 +480,53 @@
       transform: translateY(0);
     }
 
+    /* Location picker */
+    .location-row {
+      display: flex;
+      gap: 0.6rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .location-select,
+    .location-input {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 10px;
+      color: #fff;
+      padding: 0.7rem 0.9rem;
+      font-size: 0.95rem;
+      font-family: inherit;
+    }
+
+    .location-select option {
+      color: #003d99;
+    }
+
+    .location-input::placeholder {
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .btn-compact {
+      margin: 0;
+      padding: 0.7rem 1.2rem;
+      font-size: 0.9rem;
+      white-space: nowrap;
+    }
+
+    .btn-outline {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      box-shadow: none;
+    }
+
+    .btn-outline:hover {
+      background: rgba(255, 255, 255, 0.2);
+      box-shadow: none;
+    }
+
     .status-text {
       font-size: 1.8rem;
       font-weight: 700;
@@ -508,6 +555,25 @@
 
     .error {
       color: #ff9800;
+    }
+
+    /* Active NWS weather alert - deliberately louder than the glass cards,
+       since this is a safety-relevant real-time signal, not decoration */
+    .alert-banner {
+      background: linear-gradient(90deg, rgba(244, 67, 54, 0.35), rgba(255, 152, 0, 0.25));
+      border: 1px solid rgba(255, 152, 0, 0.6);
+      border-radius: 10px;
+      padding: 0.8rem 1rem;
+      margin-bottom: 1.25rem;
+      text-align: left;
+      font-size: 0.85rem;
+      line-height: 1.4;
+    }
+
+    .alert-banner strong {
+      display: block;
+      font-size: 0.95rem;
+      margin-bottom: 0.2rem;
     }
 
     @media (max-width: 600px) {
@@ -552,7 +618,24 @@
 
   <div class="container">
     <h1>Folly Flow</h1>
-    <p class="tagline">Live Beach Conditions • Folly Beach, SC 🌊</p>
+    <p class="tagline">Live Beach Conditions • <span id="tagline-location">Folly Beach, SC</span> 🌊</p>
+
+    <!-- Location Picker -->
+    <div class="card" style="text-align: center;">
+      <div class="card-header">📍 Choose Your Beach</div>
+      <div class="location-row">
+        <select id="beach-select" class="location-select">
+          <option value="">— Popular US Beaches —</option>
+        </select>
+      </div>
+      <div class="location-row">
+        <input type="text" id="beach-search-input" class="location-input" placeholder="Search any US beach (e.g. Myrtle Beach, SC)">
+        <button type="button" id="beach-search-btn" class="btn-compact">🔍 Search</button>
+      </div>
+      <button type="button" id="use-location-btn" class="btn-compact btn-outline">📍 Use My Location</button>
+      <p id="location-status" class="status-subtext" style="min-height: 1.2em;"></p>
+      <p class="status-subtext" style="opacity: 0.6; font-size: 0.7rem;">Search via OpenStreetMap Nominatim · Data © OpenStreetMap contributors · US beaches only (tide data requires a nearby NOAA station)</p>
+    </div>
 
     <!-- Crowd Level Card -->
     <div class="card" style="text-align: center;">
@@ -566,6 +649,7 @@
     <!-- Live Weather Card -->
     <div class="card" style="text-align: center;">
       <div class="card-header">☀️ Live Weather</div>
+      <div id="wx-alert-banner" class="alert-banner" style="display: none;"></div>
       <div class="stat-display">
         <div class="stat-box">
           <p class="stat-value" id="wx-temp">--°F</p>
@@ -577,17 +661,17 @@
         </div>
       </div>
       <p id="wx-desc" class="status-subtext">Fetching live conditions…</p>
-      <p class="status-subtext" style="opacity: 0.7; font-size: 0.75rem;">Source: National Weather Service, station KJZI (Charleston Executive)</p>
+      <p id="wx-station" class="status-subtext" style="opacity: 0.7; font-size: 0.75rem;">Source: National Weather Service</p>
     </div>
 
-    <!-- Bridge Traffic Card -->
+    <!-- Local Road Traffic Card -->
     <div class="card">
-      <div class="card-header">🌉 Live Bridge Traffic</div>
+      <div class="card-header">🚗 Live Road Traffic</div>
 
       <div class="map-embed-wrap">
-        <iframe src="https://maps.google.com/maps?q=32.641470,-79.977964&z=16&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Live map of the Folly Road bridge"></iframe>
+        <iframe id="beach-map-iframe" src="https://maps.google.com/maps?q=32.6551,-79.9403&z=15&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Live map near the selected beach"></iframe>
       </div>
-      <a class="live-traffic-link" href="https://www.google.com/maps/@32.641470,-79.977964,16z/data=!5m1!1e1" target="_blank" rel="noopener">🔴 Open Live Traffic in Google Maps ↗</a>
+      <a id="live-traffic-link" class="live-traffic-link" href="https://www.google.com/maps/@32.6551,-79.9403,15z/data=!5m1!1e1" target="_blank" rel="noopener">🔴 Open Live Traffic in Google Maps ↗</a>
 
       <div class="bridge-container">
         <!-- Incoming Lane -->
@@ -662,6 +746,7 @@
           <div class="tide-stat-label">Low Tide</div>
         </div>
       </div>
+      <p id="tide-station" class="status-subtext" style="opacity: 0.7; font-size: 0.75rem;"></p>
     </div>
 
     <button onclick="refreshData()">⟳ Refresh Conditions</button>
@@ -686,6 +771,60 @@
       congested: { speed: 'slow', statusText: 'Congested', statusEmoji: '🔴', color: 'congested' }
     };
 
+    // Curated US beaches - kept to the US so every card (tide, weather, traffic)
+    // stays backed by real free data. Users can also search any US location or
+    // use their current location.
+    const POPULAR_BEACHES = [
+      { name: 'Folly Beach, SC', lat: 32.6551, lon: -79.9403 },
+      { name: 'Myrtle Beach, SC', lat: 33.6891, lon: -78.8867 },
+      { name: 'Virginia Beach, VA', lat: 36.8529, lon: -75.9780 },
+      { name: 'Ocean City, MD', lat: 38.3365, lon: -75.0849 },
+      { name: 'Outer Banks (Nags Head), NC', lat: 35.9573, lon: -75.6238 },
+      { name: 'Miami Beach, FL', lat: 25.7907, lon: -80.1300 },
+      { name: 'Clearwater Beach, FL', lat: 27.9778, lon: -82.8271 },
+      { name: 'Galveston, TX', lat: 29.2988, lon: -94.7977 },
+      { name: 'Santa Monica, CA', lat: 34.0100, lon: -118.4962 },
+      { name: 'Huntington Beach, CA', lat: 33.6595, lon: -117.9988 },
+      { name: 'Rehoboth Beach, DE', lat: 38.7215, lon: -75.0760 },
+      { name: 'Waikiki Beach, HI', lat: 21.2793, lon: -157.8292 }
+    ];
+
+    const LOCATION_STORAGE_KEY = 'follyFlowLocation';
+    let currentLocation = null;
+
+    const US_STATE_ABBR = {
+      Alabama: 'AL', Alaska: 'AK', Arizona: 'AZ', Arkansas: 'AR', California: 'CA',
+      Colorado: 'CO', Connecticut: 'CT', Delaware: 'DE', Florida: 'FL', Georgia: 'GA',
+      Hawaii: 'HI', Idaho: 'ID', Illinois: 'IL', Indiana: 'IN', Iowa: 'IA',
+      Kansas: 'KS', Kentucky: 'KY', Louisiana: 'LA', Maine: 'ME', Maryland: 'MD',
+      Massachusetts: 'MA', Michigan: 'MI', Minnesota: 'MN', Mississippi: 'MS', Missouri: 'MO',
+      Montana: 'MT', Nebraska: 'NE', Nevada: 'NV', 'New Hampshire': 'NH', 'New Jersey': 'NJ',
+      'New Mexico': 'NM', 'New York': 'NY', 'North Carolina': 'NC', 'North Dakota': 'ND', Ohio: 'OH',
+      Oklahoma: 'OK', Oregon: 'OR', Pennsylvania: 'PA', 'Rhode Island': 'RI', 'South Carolina': 'SC',
+      'South Dakota': 'SD', Tennessee: 'TN', Texas: 'TX', Utah: 'UT', Vermont: 'VT',
+      Virginia: 'VA', Washington: 'WA', 'West Virginia': 'WV', Wisconsin: 'WI', Wyoming: 'WY',
+      'District of Columbia': 'DC', 'Puerto Rico': 'PR'
+    };
+
+    // Builds a "City, ST" label from a Nominatim address block, falling back
+    // to the raw display name if the address doesn't parse cleanly.
+    function labelFromAddress(address, fallback) {
+      const city = address.city || address.town || address.village || address.hamlet || '';
+      const state = US_STATE_ABBR[address.state] || address.state || '';
+      if (city && state) return `${city}, ${state}`;
+      if (city) return city;
+      return fallback;
+    }
+
+    function haversineMiles(lat1, lon1, lat2, lon2) {
+      const R = 3958.8;
+      const toRad = d => d * Math.PI / 180;
+      const dLat = toRad(lat2 - lat1);
+      const dLon = toRad(lon2 - lon1);
+      const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+      return R * 2 * Math.asin(Math.sqrt(a));
+    }
+
     // Create sun-glint shimmer particles over the real photo's water
     function createShimmers() {
       const heroBg = document.getElementById('heroBg');
@@ -700,30 +839,76 @@
       }
     }
 
-    // Fetch real tide data from NOAA CO-OPS API (Charleston Harbor Station: 8665530
-    // - the nearest station that publishes actual harmonic tide predictions; the
-    // Folly River-specific stations 8666467/8666652 do not publish predictions data).
-    // No API key exists or is needed - this is free, public, keyless NOAA data.
+    // Nearest NOAA tide-prediction station lookup - fetches the full list of
+    // ~3,500 US stations once (free, keyless, public metadata) and finds the
+    // closest by straight-line distance. Beats hardcoding one station, since
+    // the user can now pick any US beach.
+    let noaaStationsCache = null;
+    async function getNoaaStationsList() {
+      if (noaaStationsCache) return noaaStationsCache;
+      const res = await fetch('https://api.tidesandcurrents.noaa.gov/mdapi/prod/webapi/stations.json?type=tidepredictions');
+      if (!res.ok) throw new Error('NOAA station list error');
+      const data = await res.json();
+      noaaStationsCache = data.stations;
+      return noaaStationsCache;
+    }
+
+    // Returns nearby tide stations closest-first. Some stations listed under
+    // type=tidepredictions are "subordinate" stations that only publish
+    // high/low offset events, not a continuous hourly curve - the caller
+    // needs to try candidates in order until one actually returns hourly data.
+    async function findNearestNoaaStations(lat, lon, maxCandidates = 20, maxMiles = 75) {
+      const stations = await getNoaaStationsList();
+      return stations
+        .map(s => ({ id: s.id, name: s.name, state: s.state, distanceMiles: haversineMiles(lat, lon, s.lat, s.lng) }))
+        .sort((a, b) => a.distanceMiles - b.distanceMiles)
+        .filter(s => s.distanceMiles <= maxMiles)
+        .slice(0, maxCandidates);
+    }
+
+    // Fetch real tide data from NOAA CO-OPS API using whichever nearby station
+    // actually publishes usable hourly predictions. No API key needed - free,
+    // public, keyless NOAA data.
     async function fetchTides() {
       const NOAA_BASE = 'https://api.tidesandcurrents.noaa.gov/api/prod/datagetter';
-      const STATION = '8665530';
+      document.getElementById('tide-loading').style.display = 'block';
+      document.getElementById('tide-loading').innerHTML = 'Fetching live NOAA data...';
+      document.getElementById('tide-info').style.display = 'none';
+      document.getElementById('tide-station').textContent = '';
       try {
-        const [hourlyRes, hiloRes] = await Promise.all([
-          fetch(`${NOAA_BASE}?date=today&station=${STATION}&product=predictions&datum=MLLW&time_zone=lst_ldt&interval=h&units=english&format=json`),
-          fetch(`${NOAA_BASE}?date=today&station=${STATION}&product=predictions&datum=MLLW&time_zone=lst_ldt&interval=hilo&units=english&format=json`)
-        ]);
-
-        if (!hourlyRes.ok || !hiloRes.ok) throw new Error('NOAA API error');
-
-        const hourlyData = await hourlyRes.json();
-        const hiloData = await hiloRes.json();
-
-        if (!hourlyData.predictions || hourlyData.predictions.length === 0) {
-          throw new Error('No predictions returned');
+        const candidates = await findNearestNoaaStations(currentLocation.lat, currentLocation.lon);
+        if (!candidates.length) {
+          throw new Error('No NOAA tide station within range of this location');
         }
-        if (!hiloData.predictions || hiloData.predictions.length === 0) {
-          throw new Error('No high/low predictions returned');
+
+        let station = null;
+        let hourlyData = null;
+        let hiloData = null;
+        for (const candidate of candidates) {
+          const STATION = candidate.id;
+          const [hourlyRes, hiloRes] = await Promise.all([
+            fetch(`${NOAA_BASE}?date=today&station=${STATION}&product=predictions&datum=MLLW&time_zone=lst_ldt&interval=h&units=english&format=json`),
+            fetch(`${NOAA_BASE}?date=today&station=${STATION}&product=predictions&datum=MLLW&time_zone=lst_ldt&interval=hilo&units=english&format=json`)
+          ]);
+          if (!hourlyRes.ok || !hiloRes.ok) continue;
+
+          const hData = await hourlyRes.json();
+          const lData = await hiloRes.json();
+          if (hData.predictions && hData.predictions.length && lData.predictions && lData.predictions.length) {
+            station = candidate;
+            hourlyData = hData;
+            hiloData = lData;
+            break;
+          }
+          // This station doesn't publish a continuous prediction curve
+          // (a subordinate/offset-only station) - fall through to the next
+          // nearest candidate instead of failing outright.
         }
+
+        if (!station) {
+          throw new Error('No nearby NOAA station publishes usable tide predictions');
+        }
+        currentLocation.noaaStation = station;
 
         document.getElementById('tide-loading').style.display = 'none';
         document.getElementById('tide-info').style.display = 'grid';
@@ -746,12 +931,15 @@
 
         document.getElementById('tide-high').textContent = highs.length ? formatEvent(highestHigh) : 'No high tide today';
         document.getElementById('tide-low').textContent = lows.length ? formatEvent(lowestLow) : 'No low tide today';
+        document.getElementById('tide-station').textContent =
+          `Station: ${station.name}, ${station.state} (${station.distanceMiles.toFixed(0)} mi away)`;
 
         renderTideChart(labels, levels);
       } catch (error) {
         console.error('NOAA API error:', error);
-        document.getElementById('tide-loading').innerHTML = "<span class='error'>⚠️ Live NOAA tide data is unavailable right now. Try refreshing shortly.</span>";
+        document.getElementById('tide-loading').innerHTML = "<span class='error'>⚠️ Live NOAA tide data is unavailable for this location right now.</span>";
         document.getElementById('tide-info').style.display = 'none';
+        document.getElementById('tide-station').textContent = '';
       }
     }
 
@@ -812,16 +1000,16 @@
       return car;
     }
 
-    // TomTom Traffic Flow Segment Data - real-time speed vs free-flow speed
-    // for the Folly Road bridge over the Folly River (James Island <-> Folly Beach)
+    // TomTom Traffic Flow Segment Data - real-time speed vs free-flow speed for
+    // the road nearest whichever beach is currently selected. TomTom snaps to
+    // the nearest mapped road segment given any lat/lon, so this works anywhere.
     const TOMTOM_API_KEY = 'lNLNSxfKMRTfi7EWN8GwoYBCFScACXE1';
-    const BRIDGE_POINT = '32.641470,-79.977964';
 
-    // The bridge is a single undivided two-lane span, so TomTom's Flow Segment
-    // Data gives one aggregate congestion reading for it, not separate
-    // incoming/outgoing measurements. We use that real reading to drive overall
-    // severity, then split it into directions using actual beach-traffic timing
-    // patterns (heavier inbound in the morning, heavier outbound in the evening).
+    // TomTom's Flow Segment Data gives one aggregate congestion reading for a
+    // road segment, not separate incoming/outgoing measurements. We use that
+    // real reading to drive overall severity, then split it into directions
+    // using typical beach-traffic timing patterns (heavier inbound in the
+    // morning, heavier outbound in the evening) purely for the animation.
     function getDirectionalBias() {
       const hour = new Date().getHours();
       if (hour >= 6 && hour < 12) return { incoming: 0.68, outgoing: 0.32 };
@@ -840,7 +1028,8 @@
     async function fetchBridgeTraffic() {
       const sourceEl = document.getElementById('bridge-source');
       try {
-        const url = `https://api.tomtom.com/traffic/services/4/flowSegmentData/absolute/10/json?point=${BRIDGE_POINT}&key=${TOMTOM_API_KEY}`;
+        const point = `${currentLocation.lat},${currentLocation.lon}`;
+        const url = `https://api.tomtom.com/traffic/services/4/flowSegmentData/absolute/10/json?point=${point}&key=${TOMTOM_API_KEY}`;
         const response = await fetch(url);
         if (!response.ok) throw new Error('TomTom API error: ' + response.status);
         const data = await response.json();
@@ -895,13 +1084,31 @@
     }
 
     // Live weather from the National Weather Service (api.weather.gov) - free,
-    // keyless, government data. KJZI (Charleston Executive Airport) is the
-    // closest reporting station to Folly Beach.
+    // keyless, government data, covering any US location. The nearest
+    // reporting station is resolved dynamically for whichever beach is
+    // selected, then cached on currentLocation so it isn't re-resolved on
+    // every refresh.
     let latestWeather = null;
+
+    async function resolveNwsStation(lat, lon) {
+      const pointRes = await fetch(`https://api.weather.gov/points/${lat.toFixed(4)},${lon.toFixed(4)}`);
+      if (!pointRes.ok) throw new Error('NWS points lookup error: ' + pointRes.status);
+      const pointData = await pointRes.json();
+      const stationsRes = await fetch(pointData.properties.observationStations);
+      if (!stationsRes.ok) throw new Error('NWS station lookup error: ' + stationsRes.status);
+      const stationsData = await stationsRes.json();
+      if (!stationsData.features.length) throw new Error('No NWS station found nearby');
+      const feature = stationsData.features[0];
+      return { id: feature.properties.stationIdentifier, name: feature.properties.name };
+    }
 
     async function fetchWeather() {
       try {
-        const res = await fetch('https://api.weather.gov/stations/KJZI/observations/latest');
+        if (!currentLocation.nwsStation) {
+          currentLocation.nwsStation = await resolveNwsStation(currentLocation.lat, currentLocation.lon);
+        }
+        const station = currentLocation.nwsStation;
+        const res = await fetch(`https://api.weather.gov/stations/${station.id}/observations/latest`);
         if (!res.ok) throw new Error('NWS API error: ' + res.status);
         const data = await res.json();
         const p = data.properties;
@@ -917,6 +1124,7 @@
         document.getElementById('wx-temp').textContent = tempF != null ? Math.round(tempF) + '°F' : '--°F';
         document.getElementById('wx-wind').textContent = windMph != null ? Math.round(windMph) + ' mph' : '-- mph';
         document.getElementById('wx-desc').textContent = desc || 'Conditions unavailable';
+        document.getElementById('wx-station').textContent = `Source: National Weather Service, station ${station.id} (${station.name})`;
       } catch (error) {
         console.error('NWS API error:', error);
         latestWeather = null;
@@ -924,9 +1132,46 @@
       }
     }
 
+    // NWS active weather alerts (Severe Thunderstorm/Tornado/Flood/Heat
+    // Warnings, etc.) - free, keyless, and issued the instant a forecaster
+    // calls it. This is genuinely real-time, unlike station observations
+    // above, which only refresh every 20-60 minutes and can miss a storm
+    // that just started.
+    let latestAlert = null;
+
+    async function fetchAlerts() {
+      const banner = document.getElementById('wx-alert-banner');
+      try {
+        const res = await fetch(`https://api.weather.gov/alerts/active?point=${currentLocation.lat},${currentLocation.lon}`);
+        if (!res.ok) throw new Error('NWS alerts API error: ' + res.status);
+        const data = await res.json();
+
+        if (!data.features.length) {
+          latestAlert = null;
+          banner.style.display = 'none';
+          return;
+        }
+
+        // Prefer the most severe active alert
+        const severityRank = { Extreme: 4, Severe: 3, Moderate: 2, Minor: 1, Unknown: 0 };
+        const top = data.features.reduce((a, b) =>
+          (severityRank[b.properties.severity] || 0) > (severityRank[a.properties.severity] || 0) ? b : a
+        );
+        latestAlert = top.properties;
+
+        banner.innerHTML = `<strong>⚠️ ${latestAlert.event}</strong>${latestAlert.headline || ''}`;
+        banner.style.display = 'block';
+      } catch (error) {
+        console.error('NWS alerts API error:', error);
+        latestAlert = null;
+        banner.style.display = 'none';
+      }
+    }
+
     // The beach has no free public crowd sensor, so this is an honest estimate
-    // built from real signals (time of day, weekend vs. weekday, live weather)
-    // rather than a random number - it's labeled as an estimate in the UI.
+    // built from real signals (time of day, weekend vs. weekday, live weather,
+    // and active weather alerts) rather than a random number - it's labeled
+    // as an estimate in the UI.
     function computeCrowdScore() {
       const now = new Date();
       const hour = now.getHours() + now.getMinutes() / 60;
@@ -946,6 +1191,13 @@
         const desc = (latestWeather.desc || '').toLowerCase();
         if (/rain|storm|thunder|shower/.test(desc)) score *= 0.4;
         else if (/cloud|overcast|fog/.test(desc)) score *= 0.85;
+      }
+
+      if (latestAlert) {
+        const event = latestAlert.event.toLowerCase();
+        if (/thunderstorm|tornado|hurricane|flood/.test(event)) score *= 0.15;
+        else if (/heat/.test(event)) score *= 0.9; // people still go, just later/shorter
+        else score *= 0.5; // any other active warning - be conservative
       }
 
       score += (Math.random() - 0.5) * 0.8; // small natural variability
@@ -981,16 +1233,129 @@
       document.getElementById('timestamp').textContent = "Updated • " + new Date().toLocaleTimeString();
     }
 
+    // Switches every data-driven card over to a new beach: updates the map,
+    // persists the choice, and re-runs every live fetch against the new
+    // coordinates.
+    function setLocation(name, lat, lon) {
+      currentLocation = { name, lat, lon, nwsStation: null, noaaStation: null };
+      localStorage.setItem(LOCATION_STORAGE_KEY, JSON.stringify({ name, lat, lon }));
+
+      document.getElementById('tagline-location').textContent = name;
+      document.getElementById('beach-map-iframe').src = `https://maps.google.com/maps?q=${lat},${lon}&z=15&output=embed`;
+      document.getElementById('live-traffic-link').href = `https://www.google.com/maps/@${lat},${lon},15z/data=!5m1!1e1`;
+      document.getElementById('location-status').textContent = '';
+
+      const preset = POPULAR_BEACHES.find(b => b.name === name);
+      document.getElementById('beach-select').value = preset ? preset.name : '';
+
+      fetchTides();
+      fetchBridgeTraffic();
+      Promise.all([fetchWeather(), fetchAlerts()]).then(refreshData);
+    }
+
+    async function searchBeach() {
+      const input = document.getElementById('beach-search-input');
+      const query = input.value.trim();
+      const statusEl = document.getElementById('location-status');
+      if (!query) return;
+
+      statusEl.textContent = 'Searching…';
+      try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&countrycodes=us&format=json&limit=1&addressdetails=1`);
+        if (!res.ok) throw new Error('Geocoding error: ' + res.status);
+        const results = await res.json();
+        if (!results.length) {
+          statusEl.textContent = `No US location found for "${query}". Try a different spelling.`;
+          return;
+        }
+        const r = results[0];
+        const label = labelFromAddress(r.address || {}, r.display_name.split(',').slice(0, 2).join(',').trim());
+        setLocation(label, parseFloat(r.lat), parseFloat(r.lon));
+      } catch (error) {
+        console.error('Geocode error:', error);
+        statusEl.textContent = '⚠️ Search failed. Try again shortly.';
+      }
+    }
+
+    function useMyLocation() {
+      const statusEl = document.getElementById('location-status');
+      if (!navigator.geolocation) {
+        statusEl.textContent = 'Geolocation is not supported by this browser.';
+        return;
+      }
+      statusEl.textContent = 'Locating…';
+      navigator.geolocation.getCurrentPosition(async (pos) => {
+        const { latitude, longitude } = pos.coords;
+        let label = 'Your Location';
+        try {
+          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&zoom=12`);
+          if (res.ok) {
+            const data = await res.json();
+            label = labelFromAddress(data.address || {}, label);
+          }
+        } catch (e) {
+          console.error('Reverse geocode error:', e);
+        }
+        setLocation(label, latitude, longitude);
+      }, (err) => {
+        statusEl.textContent = '⚠️ Could not get your location (' + err.message + ').';
+      });
+    }
+
     // Initialize on load
     window.addEventListener('load', () => {
       createShimmers();
+
+      const select = document.getElementById('beach-select');
+      POPULAR_BEACHES.forEach(beach => {
+        const opt = document.createElement('option');
+        opt.value = beach.name;
+        opt.textContent = beach.name;
+        select.appendChild(opt);
+      });
+
+      let initial = POPULAR_BEACHES[0];
+      const saved = localStorage.getItem(LOCATION_STORAGE_KEY);
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (parsed && parsed.name && typeof parsed.lat === 'number' && typeof parsed.lon === 'number') {
+            initial = parsed;
+          }
+        } catch (e) {
+          console.error('Could not parse saved location:', e);
+        }
+      }
+      currentLocation = { ...initial, nwsStation: null, noaaStation: null };
+      document.getElementById('tagline-location').textContent = currentLocation.name;
+      document.getElementById('beach-map-iframe').src = `https://maps.google.com/maps?q=${currentLocation.lat},${currentLocation.lon}&z=15&output=embed`;
+      document.getElementById('live-traffic-link').href = `https://www.google.com/maps/@${currentLocation.lat},${currentLocation.lon},15z/data=!5m1!1e1`;
+      const preset = POPULAR_BEACHES.find(b => b.name === currentLocation.name);
+      select.value = preset ? preset.name : '';
+
+      select.addEventListener('change', (e) => {
+        const beach = POPULAR_BEACHES.find(b => b.name === e.target.value);
+        if (beach) setLocation(beach.name, beach.lat, beach.lon);
+      });
+      document.getElementById('beach-search-btn').addEventListener('click', searchBeach);
+      document.getElementById('beach-search-input').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          searchBeach();
+        }
+      });
+      document.getElementById('use-location-btn').addEventListener('click', useMyLocation);
+
       fetchTides();
       fetchBridgeTraffic();
-      fetchWeather().then(refreshData);
+      Promise.all([fetchWeather(), fetchAlerts()]).then(refreshData);
       // Crowd estimate refreshes every 30 seconds
       setInterval(refreshData, 30000);
       // Live weather refreshes every 10 minutes - NWS stations report roughly hourly
       setInterval(fetchWeather, 600000);
+      // Weather alerts can be issued at any moment, so check more often than
+      // the station observation
+      setInterval(fetchAlerts, 180000);
       // Real traffic data refreshes every 5 minutes - this API key is shared by
       // every visitor to the site, so we keep this conservative to stay well
       // under TomTom's free daily request quota.
