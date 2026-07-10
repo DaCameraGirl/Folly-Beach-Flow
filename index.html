@@ -25,8 +25,8 @@
       background: linear-gradient(180deg, #87CEEB 0%, #4da6e6 25%, #1e90ff 50%, #0066cc 75%, #003d99 100%);
     }
 
-    /* Full background ocean effect */
-    .ocean-bg {
+    /* Full background hero: a real photo of Folly Beach Pier, not a CSS gradient */
+    .hero-bg {
       position: fixed;
       top: 0;
       left: 0;
@@ -34,138 +34,55 @@
       height: 100%;
       z-index: 0;
       overflow: hidden;
+      background: #06263f;
     }
 
-    /* Sun sparkle effect */
-    .sun {
+    .hero-photo {
       position: absolute;
-      top: 10%;
-      right: 15%;
-      width: 80px;
-      height: 80px;
-      background: radial-gradient(circle, #ffeb3b, rgba(255, 235, 59, 0.3));
-      border-radius: 50%;
-      box-shadow: 0 0 80px rgba(255, 235, 59, 0.6), 0 0 150px rgba(255, 235, 59, 0.3);
-      z-index: 1;
-      animation: sunGlow 4s ease-in-out infinite;
+      inset: -6% -6%;
+      background-image: url('https://commons.wikimedia.org/wiki/Special:FilePath/Folly-Beach-Pier-sc.jpg?width=1600');
+      background-size: cover;
+      background-position: center 42%;
+      filter: saturate(1.15) contrast(1.05) brightness(0.92);
+      animation: kenBurns 50s ease-in-out infinite alternate;
     }
 
-    @keyframes sunGlow {
-      0%, 100% { box-shadow: 0 0 80px rgba(255, 235, 59, 0.6), 0 0 150px rgba(255, 235, 59, 0.3); }
-      50% { box-shadow: 0 0 100px rgba(255, 235, 59, 0.8), 0 0 180px rgba(255, 235, 59, 0.5); }
+    @keyframes kenBurns {
+      0% { transform: scale(1) translate(0, 0); }
+      100% { transform: scale(1.14) translate(-1.5%, -2.5%); }
     }
 
-    /* Sun rays beaming outward */
-    .sun-rays {
+    /* Scrim so white card text stays legible over a busy photo */
+    .hero-scrim {
       position: absolute;
-      top: 10%;
-      right: 15%;
-      width: 420px;
-      height: 420px;
-      transform: translate(28%, -24%);
-      background: conic-gradient(
-        from 0deg,
-        rgba(255, 245, 180, 0.28) 0deg, transparent 14deg,
-        transparent 26deg, rgba(255, 245, 180, 0.22) 40deg,
-        transparent 54deg, transparent 66deg,
-        rgba(255, 245, 180, 0.25) 80deg, transparent 94deg,
-        transparent 106deg, rgba(255, 245, 180, 0.2) 120deg,
-        transparent 134deg, transparent 146deg,
-        rgba(255, 245, 180, 0.26) 160deg, transparent 174deg,
-        transparent 186deg, rgba(255, 245, 180, 0.22) 200deg,
-        transparent 214deg, transparent 226deg,
-        rgba(255, 245, 180, 0.2) 240deg, transparent 254deg,
-        transparent 266deg, rgba(255, 245, 180, 0.25) 280deg,
-        transparent 294deg, transparent 306deg,
-        rgba(255, 245, 180, 0.22) 320deg, transparent 334deg,
-        transparent 346deg, rgba(255, 245, 180, 0.28) 360deg
-      );
-      border-radius: 50%;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(3, 15, 28, 0.35) 0%, rgba(3, 15, 28, 0.4) 30%, rgba(2, 12, 24, 0.82) 100%);
+    }
+
+    /* Warm sun glare, blended onto the real photo instead of a fake drawn circle */
+    .sun-glare {
+      position: absolute;
+      top: -12%;
+      right: -8%;
+      width: 55%;
+      height: 55%;
+      background: radial-gradient(circle, rgba(255, 214, 140, 0.55), rgba(255, 214, 140, 0) 70%);
       mix-blend-mode: screen;
-      animation: rayRotate 90s linear infinite;
-      z-index: 0;
+      animation: sunPulse 6s ease-in-out infinite;
       pointer-events: none;
     }
 
-    @keyframes rayRotate {
-      from { transform: translate(28%, -24%) rotate(0deg); }
-      to { transform: translate(28%, -24%) rotate(360deg); }
+    @keyframes sunPulse {
+      0%, 100% { opacity: 0.75; }
+      50% { opacity: 1; }
     }
 
-    /* Bright sun reflection glittering down onto the water */
-    .sun-glitter {
-      position: absolute;
-      top: 16%;
-      right: 20.5%;
-      width: 160px;
-      height: 84%;
-      background: linear-gradient(180deg, rgba(255, 248, 200, 0.5) 0%, rgba(255, 244, 180, 0.18) 45%, transparent 75%);
-      clip-path: polygon(47% 0%, 53% 0%, 88% 100%, 12% 100%);
-      filter: blur(2px);
-      z-index: 1;
-      pointer-events: none;
-      animation: glitterPulse 3.4s ease-in-out infinite;
-    }
-
-    @keyframes glitterPulse {
-      0%, 100% { opacity: 0.45; }
-      50% { opacity: 0.75; }
-    }
-
-    .glint {
-      position: absolute;
-      background: rgba(255, 255, 255, 0.95);
-      border-radius: 50%;
-      box-shadow: 0 0 6px rgba(255, 250, 210, 0.9);
-    }
-
-    svg.wave {
-      z-index: 2;
-    }
-
-    /* Sandy shoreline the waves wash onto */
-    .shore {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 8%;
-      min-height: 50px;
-      background: linear-gradient(180deg, #e8d4a0 0%, #d9c088 45%, #c2a86f 100%);
-      z-index: 3;
-      overflow: hidden;
-      box-shadow: 0 -8px 20px rgba(0, 0, 0, 0.15);
-    }
-
-    .foam-wash {
-      position: absolute;
-      left: -10%;
-      width: 120%;
-      height: 70px;
-      top: -35px;
-      background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.55) 45%, transparent 75%);
-      border-radius: 50%;
-      transform: scaleY(0.15) translateY(35px);
-      opacity: 0;
-    }
-
-    .foam-1 { animation: foamWash 4.5s ease-in-out infinite; }
-    .foam-2 { animation: foamWash 6s ease-in-out infinite 1.6s; }
-    .foam-3 { animation: foamWash 5.2s ease-in-out infinite 3.1s; }
-
-    @keyframes foamWash {
-      0% { transform: scaleY(0.15) translateY(38px); opacity: 0; }
-      30% { transform: scaleY(1) translateY(0px); opacity: 0.9; }
-      55% { transform: scaleY(0.85) translateY(6px); opacity: 0.65; }
-      100% { transform: scaleY(0.1) translateY(40px); opacity: 0; }
-    }
-
-    /* Shimmer particles in water */
+    /* Sun-glint particles catching the light on real water, confined low on the photo */
     .shimmer {
       position: absolute;
       width: 3px;
       height: 3px;
-      background: rgba(255, 255, 255, 0.8);
+      background: rgba(255, 244, 214, 0.85);
       border-radius: 50%;
       opacity: 0;
       animation: shimmerFloat 6s infinite ease-in-out;
@@ -184,53 +101,8 @@
       }
       100% {
         opacity: 0;
-        transform: translateY(-800px);
+        transform: translateY(-140px);
       }
-    }
-
-    /* Multiple wave layers */
-    svg.wave {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: auto;
-    }
-
-    @keyframes wave1 {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(100%); }
-    }
-
-    @keyframes wave2 {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(-100%); }
-    }
-
-    @keyframes wave3 {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(100%); }
-    }
-
-    @keyframes wave4 {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(-100%); }
-    }
-
-    .wave-fastest {
-      animation: wave1 6s linear infinite;
-    }
-
-    .wave-fast {
-      animation: wave2 8s linear infinite;
-    }
-
-    .wave-medium {
-      animation: wave3 12s linear infinite;
-    }
-
-    .wave-slow {
-      animation: wave4 16s linear infinite;
     }
 
     .container {
@@ -321,29 +193,64 @@
     .fill {
       height: 100%;
       width: 38%;
-      background: linear-gradient(90deg, #00e5ff, #4dd0e1);
+      background: linear-gradient(90deg, #ffb703, #fb8500);
       transition: width 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
       border-radius: 9999px;
-      box-shadow: 0 0 20px rgba(0, 229, 255, 0.8);
+      box-shadow: 0 0 20px rgba(255, 183, 3, 0.7);
     }
 
-    /* Bridge Visualization */
+    /* Live map embed - a real satellite/road view of the actual bridge */
+    .map-embed-wrap {
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      margin-bottom: 0.75rem;
+    }
+
+    .map-embed-wrap iframe {
+      display: block;
+      width: 100%;
+      height: 220px;
+      border: 0;
+    }
+
+    .live-traffic-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #ffe8b3;
+      text-decoration: none;
+      margin-bottom: 1.25rem;
+    }
+
+    .live-traffic-link:hover {
+      text-decoration: underline;
+    }
+
+    /* Bridge Visualization - styled like an actual causeway span, not a gray box */
     .bridge-container {
-      background: linear-gradient(180deg, rgba(100, 100, 100, 0.4), rgba(80, 80, 80, 0.3));
-      border: 2px solid rgba(150, 150, 150, 0.6);
+      background: linear-gradient(180deg, #5b6672 0%, #454e59 55%, #363d47 100%);
+      border: 1px solid rgba(255, 255, 255, 0.15);
       border-radius: 12px;
       padding: 1.5rem;
       margin: 1.5rem 0;
       position: relative;
+      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.3), 0 6px 18px rgba(0, 0, 0, 0.25);
     }
 
     .bridge-section {
-      background: linear-gradient(180deg, rgba(120, 120, 120, 0.5), rgba(100, 100, 100, 0.4));
+      background: linear-gradient(180deg, #3d434c, #2f343b);
       border-radius: 8px;
       padding: 1rem;
       margin-bottom: 1rem;
       position: relative;
       overflow: hidden;
+      border-top: 3px solid rgba(255, 255, 255, 0.18);
+      border-bottom: 3px solid rgba(0, 0, 0, 0.35);
     }
 
     .bridge-section:last-child {
@@ -353,17 +260,18 @@
     .bridge-lanes {
       position: relative;
       height: 60px;
-      background: linear-gradient(180deg, rgba(150, 150, 150, 0.3), rgba(120, 120, 120, 0.2));
+      background:
+        repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.35) 0 22px, transparent 22px 48px) center / 100% 2px no-repeat,
+        linear-gradient(180deg, #26292e 0%, #1c1e22 100%);
       border-radius: 6px;
       overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(0, 0, 0, 0.4);
     }
 
     .lane {
       position: absolute;
       width: 100%;
       height: 28px;
-      border-bottom: 1px dashed rgba(255, 255, 255, 0.3);
       display: flex;
       align-items: center;
     }
@@ -374,69 +282,56 @@
 
     .lane:last-child {
       top: 32px;
-      border-bottom: none;
     }
 
-    /* Realistic car styling */
+    /* Car silhouette via clip-path instead of a flat colored rectangle */
     .car {
       position: absolute;
-      width: 36px;
-      height: 20px;
+      width: 34px;
+      height: 17px;
       background: linear-gradient(135deg, #FF6B6B 0%, #FF8E72 50%, #FFD93D 100%);
-      border-radius: 4px;
-      box-shadow: 0 0 8px rgba(255, 107, 107, 0.6), inset -2px -2px 4px rgba(0, 0, 0, 0.3);
-      opacity: 0.9;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 10px;
-      color: #fff;
-      font-weight: bold;
+      clip-path: polygon(6% 12%, 20% 0%, 80% 0%, 94% 12%, 100% 38%, 100% 62%, 94% 88%, 80% 100%, 20% 100%, 6% 88%, 0% 62%, 0% 38%);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+      opacity: 0.95;
       position: relative;
     }
 
-    /* Car windows */
+    /* Windshield band */
     .car::before {
       content: '';
       position: absolute;
-      width: 6px;
-      height: 6px;
-      background: rgba(135, 206, 235, 0.8);
-      border-radius: 1px;
-      left: 6px;
-      top: 2px;
+      top: 3px;
+      left: 9px;
+      right: 9px;
+      height: 5px;
+      background: linear-gradient(180deg, rgba(190, 226, 255, 0.9), rgba(120, 170, 220, 0.5));
+      border-radius: 2px;
     }
 
+    /* Roof shading for depth */
     .car::after {
       content: '';
       position: absolute;
-      width: 6px;
-      height: 6px;
-      background: rgba(135, 206, 235, 0.8);
-      border-radius: 1px;
-      right: 6px;
-      top: 2px;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.25), transparent 30%, transparent 70%, rgba(0, 0, 0, 0.25));
+      clip-path: inherit;
     }
 
     /* Traffic light colors */
     .car.light {
       background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 50%, #81C784 100%);
-      box-shadow: 0 0 8px rgba(76, 175, 80, 0.6), inset -2px -2px 4px rgba(0, 0, 0, 0.3);
     }
 
     .car.moderate {
       background: linear-gradient(135deg, #FFC107 0%, #FFD54F 50%, #FFEB3B 100%);
-      box-shadow: 0 0 8px rgba(255, 193, 7, 0.6), inset -2px -2px 4px rgba(0, 0, 0, 0.3);
     }
 
     .car.heavy {
       background: linear-gradient(135deg, #FF9800 0%, #FFB74D 50%, #FFCC80 100%);
-      box-shadow: 0 0 8px rgba(255, 152, 0, 0.6), inset -2px -2px 4px rgba(0, 0, 0, 0.3);
     }
 
     .car.congested {
       background: linear-gradient(135deg, #F44336 0%, #EF5350 50%, #E57373 100%);
-      box-shadow: 0 0 8px rgba(244, 67, 54, 0.6), inset -2px -2px 4px rgba(0, 0, 0, 0.3);
     }
 
     @keyframes driveFast {
@@ -637,31 +532,22 @@
         padding: 1.5rem;
       }
 
-      .sun {
-        width: 60px;
-        height: 60px;
-        top: 5%;
-        right: 10%;
-      }
-
       .car {
         width: 28px;
-        height: 16px;
-        font-size: 8px;
+        height: 14px;
+      }
+
+      .map-embed-wrap iframe {
+        height: 180px;
       }
     }
   </style>
 </head>
 <body>
-  <div class="ocean-bg" id="oceanBg">
-    <div class="sun-rays"></div>
-    <div class="sun"></div>
-    <div class="sun-glitter"></div>
-    <div class="shore">
-      <div class="foam-wash foam-1"></div>
-      <div class="foam-wash foam-2"></div>
-      <div class="foam-wash foam-3"></div>
-    </div>
+  <div class="hero-bg" id="heroBg">
+    <div class="hero-photo"></div>
+    <div class="hero-scrim"></div>
+    <div class="sun-glare"></div>
   </div>
 
   <div class="container">
@@ -670,16 +556,39 @@
 
     <!-- Crowd Level Card -->
     <div class="card" style="text-align: center;">
-      <div class="card-header">Current Crowd Level</div>
+      <div class="card-header">Estimated Crowd Level</div>
       <p id="status" class="status-text">Chill • 3.8 / 10</p>
       <div class="meter"><div class="fill" id="fill" style="width:38%"></div></div>
       <p id="crowdDesc" class="status-subtext">The beach is pretty relaxed right now 🏖️</p>
+      <p class="status-subtext" style="opacity: 0.7; font-size: 0.75rem;">Algorithmic estimate from time of day, day of week &amp; live weather — not a crowd sensor.</p>
+    </div>
+
+    <!-- Live Weather Card -->
+    <div class="card" style="text-align: center;">
+      <div class="card-header">☀️ Live Weather</div>
+      <div class="stat-display">
+        <div class="stat-box">
+          <p class="stat-value" id="wx-temp">--°F</p>
+          <p class="stat-label">Temperature</p>
+        </div>
+        <div class="stat-box">
+          <p class="stat-value" id="wx-wind">-- mph</p>
+          <p class="stat-label">Wind</p>
+        </div>
+      </div>
+      <p id="wx-desc" class="status-subtext">Fetching live conditions…</p>
+      <p class="status-subtext" style="opacity: 0.7; font-size: 0.75rem;">Source: National Weather Service, station KJZI (Charleston Executive)</p>
     </div>
 
     <!-- Bridge Traffic Card -->
     <div class="card">
       <div class="card-header">🌉 Live Bridge Traffic</div>
-      
+
+      <div class="map-embed-wrap">
+        <iframe src="https://maps.google.com/maps?q=32.641470,-79.977964&z=16&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Live map of the Folly Road bridge"></iframe>
+      </div>
+      <a class="live-traffic-link" href="https://www.google.com/maps/@32.641470,-79.977964,16z/data=!5m1!1e1" target="_blank" rel="noopener">🔴 Open Live Traffic in Google Maps ↗</a>
+
       <div class="bridge-container">
         <!-- Incoming Lane -->
         <div class="bridge-section">
@@ -699,15 +608,15 @@
           </div>
         </div>
 
-        <!-- Traffic Stats -->
+        <!-- Traffic Stats - real TomTom speed data, not invented vehicle counts -->
         <div class="traffic-stats">
           <div class="traffic-stat-item">
-            <div class="traffic-stat-value" id="incoming-count">15</div>
-            <div class="traffic-stat-label">Cars Incoming</div>
+            <div class="traffic-stat-value" id="current-speed">-- mph</div>
+            <div class="traffic-stat-label">Current Speed</div>
           </div>
           <div class="traffic-stat-item">
-            <div class="traffic-stat-value" id="outgoing-count">6</div>
-            <div class="traffic-stat-label">Cars Outgoing</div>
+            <div class="traffic-stat-value" id="freeflow-speed">-- mph</div>
+            <div class="traffic-stat-label">Normal (Free-Flow) Speed</div>
           </div>
         </div>
 
@@ -732,7 +641,7 @@
       </div>
 
       <p id="bridge-status" class="status-text" style="font-size: 1.2rem; margin-top: 1rem;">Light & Flowing 🟢</p>
-      <p id="bridge-count" class="status-subtext">~45 vehicles/min total</p>
+      <p id="bridge-count" class="status-subtext">-- % of normal flow speed</p>
       <p id="bridge-source" class="status-subtext" style="opacity: 0.75; font-size: 0.75rem;">Loading live traffic…</p>
     </div>
 
@@ -777,88 +686,18 @@
       congested: { speed: 'slow', statusText: 'Congested', statusEmoji: '🔴', color: 'congested' }
     };
 
-    // Create shimmer particles
+    // Create sun-glint shimmer particles over the real photo's water
     function createShimmers() {
-      const oceanBg = document.getElementById('oceanBg');
-      for (let i = 0; i < 30; i++) {
+      const heroBg = document.getElementById('heroBg');
+      for (let i = 0; i < 24; i++) {
         const shimmer = document.createElement('div');
         shimmer.className = 'shimmer';
         shimmer.style.left = Math.random() * 100 + '%';
-        shimmer.style.bottom = Math.random() * 60 + '%';
+        shimmer.style.bottom = Math.random() * 38 + '%';
         shimmer.style.animationDelay = Math.random() * 6 + 's';
         shimmer.style.animationDuration = (4 + Math.random() * 4) + 's';
-        oceanBg.appendChild(shimmer);
+        heroBg.appendChild(shimmer);
       }
-    }
-
-    // Create animated ocean waves
-    function createOceanWaves() {
-      const oceanBg = document.getElementById('oceanBg');
-      
-      // Remove old waves but keep sun and shimmers
-      const oldWaves = oceanBg.querySelectorAll('svg.wave');
-      oldWaves.forEach(w => w.remove());
-
-      // Create SVG waves with different speeds for depth effect
-      const waveConfigs = [
-        { class: 'wave-fastest', yOffset: 0, amplitude: 35, frequency: 0.018, opacity: 0.8 },
-        { class: 'wave-fast', yOffset: 35, amplitude: 30, frequency: 0.015, opacity: 0.7 },
-        { class: 'wave-medium', yOffset: 65, amplitude: 25, frequency: 0.012, opacity: 0.6 },
-        { class: 'wave-slow', yOffset: 90, amplitude: 20, frequency: 0.01, opacity: 0.5 }
-      ];
-
-      waveConfigs.forEach((config, index) => {
-        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        svg.setAttribute('viewBox', '0 0 1200 120');
-        svg.setAttribute('preserveAspectRatio', 'none');
-        svg.setAttribute('class', `wave ${config.class}`);
-        svg.style.height = 'auto';
-        svg.style.minHeight = '100px';
-
-        const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
-        
-        // Create gradients for each wave layer
-        const gradientId = `waveGradient${index}`;
-        const gradient = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
-        gradient.setAttribute('id', gradientId);
-        gradient.setAttribute('x1', '0%');
-        gradient.setAttribute('y1', '0%');
-        gradient.setAttribute('x2', '0%');
-        gradient.setAttribute('y2', '100%');
-
-        // Beautiful ocean colors with sun reflection
-        const stops = [
-          { offset: '0%', color: `rgba(100, 200, 255, ${config.opacity})` },
-          { offset: '40%', color: `rgba(50, 180, 230, ${config.opacity * 0.9})` },
-          { offset: '80%', color: `rgba(30, 120, 200, ${config.opacity * 0.7})` },
-          { offset: '100%', color: `rgba(10, 80, 150, ${config.opacity * 0.5})` }
-        ];
-
-        stops.forEach(stop => {
-          const st = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
-          st.setAttribute('offset', stop.offset);
-          st.setAttribute('stop-color', stop.color);
-          gradient.appendChild(st);
-        });
-
-        defs.appendChild(gradient);
-        svg.appendChild(defs);
-
-        // Create wave path with sine wave pattern
-        let pathData = 'M0,60';
-        for (let x = 0; x <= 1200; x += 25) {
-          const y = 60 + Math.sin(x * config.frequency) * config.amplitude;
-          pathData += ` L${x},${y}`;
-        }
-        pathData += ' L1200,120 L0,120 Z';
-
-        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        path.setAttribute('d', pathData);
-        path.setAttribute('fill', `url(#${gradientId})`);
-
-        svg.appendChild(path);
-        oceanBg.appendChild(svg);
-      });
     }
 
     // Fetch real tide data from NOAA CO-OPS API (Charleston Harbor Station: 8665530
@@ -1007,7 +846,7 @@
         const data = await response.json();
         const seg = data.flowSegmentData;
         const congestion = Math.min(1, Math.max(0, 1 - (seg.currentSpeed / seg.freeFlowSpeed)));
-        updateBridgeTraffic(congestion);
+        updateBridgeTraffic(congestion, seg.currentSpeed, seg.freeFlowSpeed);
         sourceEl.textContent = '🟢 Live traffic data from TomTom';
       } catch (error) {
         console.error('TomTom Traffic API error:', error);
@@ -1016,62 +855,112 @@
         });
         document.getElementById('bridge-status').textContent = '⚠️ Traffic data unavailable';
         document.getElementById('bridge-count').textContent = '';
-        document.getElementById('incoming-count').textContent = '—';
-        document.getElementById('outgoing-count').textContent = '—';
+        document.getElementById('current-speed').textContent = '—';
+        document.getElementById('freeflow-speed').textContent = '—';
         sourceEl.textContent = '🔴 Live traffic unavailable right now. Try refreshing shortly.';
       }
     }
 
-    function updateBridgeTraffic(congestion) {
+    // TomTom's Flow Segment Data reports speed (km/h), not vehicle volume, so
+    // the UI shows real current-vs-normal speed instead of an invented
+    // "vehicles/min" figure. The animated cars are a stylized density cue tied
+    // to the real congestion ratio, not a claim of an exact vehicle count.
+    function updateBridgeTraffic(congestion, currentSpeedKmh, freeFlowSpeedKmh) {
       const incomingLane1 = document.getElementById('incoming-lane-1');
       const incomingLane2 = document.getElementById('incoming-lane-2');
       const outgoingLane1 = document.getElementById('outgoing-lane-1');
       const outgoingLane2 = document.getElementById('outgoing-lane-2');
       const bridgeStatus = document.getElementById('bridge-status');
       const bridgeCount = document.getElementById('bridge-count');
-      const incomingCountEl = document.getElementById('incoming-count');
-      const outgoingCountEl = document.getElementById('outgoing-count');
 
       [incomingLane1, incomingLane2, outgoingLane1, outgoingLane2].forEach(lane => lane.innerHTML = '');
 
       const config = levelForCongestion(congestion);
       const bias = getDirectionalBias();
-      const totalCars = Math.round(6 + congestion * 24);
-      const incomingCars = Math.max(1, Math.round(totalCars * bias.incoming));
-      const outgoingCars = Math.max(1, totalCars - incomingCars);
-      const totalRate = Math.round(30 + congestion * 105);
-      const incomingRate = Math.round(totalRate * bias.incoming);
-      const outgoingRate = totalRate - incomingRate;
+      const totalDensity = 8 + congestion * 20; // stylized car count, not a measured figure
+      const incomingDensity = Math.max(1, Math.round(totalDensity * bias.incoming));
+      const outgoingDensity = Math.max(1, Math.round(totalDensity * bias.outgoing));
 
-      for (let i = 0; i < incomingCars; i++) {
-        incomingLane1.appendChild(createBridgeCar(config.color, config.speed, false));
-        if (i % 2 === 1) {
-          incomingLane2.appendChild(createBridgeCar(config.color, config.speed, false));
-        }
+      for (let i = 0; i < incomingDensity; i++) {
+        (i % 2 === 0 ? incomingLane1 : incomingLane2).appendChild(createBridgeCar(config.color, config.speed, false));
       }
-
-      for (let i = 0; i < outgoingCars; i++) {
-        outgoingLane1.appendChild(createBridgeCar(config.color, config.speed, true));
-        if (i % 2 === 1) {
-          outgoingLane2.appendChild(createBridgeCar(config.color, config.speed, true));
-        }
+      for (let i = 0; i < outgoingDensity; i++) {
+        (i % 2 === 0 ? outgoingLane1 : outgoingLane2).appendChild(createBridgeCar(config.color, config.speed, true));
       }
 
       bridgeStatus.textContent = `${config.statusText} ${config.statusEmoji}`;
-      bridgeCount.textContent = `~${totalRate} vehicles/min total`;
-      incomingCountEl.textContent = incomingCars;
-      outgoingCountEl.textContent = outgoingCars;
+      bridgeCount.textContent = `${Math.round((1 - congestion) * 100)}% of normal flow speed`;
+      document.getElementById('current-speed').textContent = Math.round(currentSpeedKmh * 0.621371) + ' mph';
+      document.getElementById('freeflow-speed').textContent = Math.round(freeFlowSpeedKmh * 0.621371) + ' mph';
+    }
+
+    // Live weather from the National Weather Service (api.weather.gov) - free,
+    // keyless, government data. KJZI (Charleston Executive Airport) is the
+    // closest reporting station to Folly Beach.
+    let latestWeather = null;
+
+    async function fetchWeather() {
+      try {
+        const res = await fetch('https://api.weather.gov/stations/KJZI/observations/latest');
+        if (!res.ok) throw new Error('NWS API error: ' + res.status);
+        const data = await res.json();
+        const p = data.properties;
+
+        const tempF = p.temperature && p.temperature.value != null
+          ? (p.temperature.value * 9 / 5 + 32) : null;
+        const windMph = p.windSpeed && p.windSpeed.value != null
+          ? (p.windSpeed.value * 0.621371) : null;
+        const desc = p.textDescription || null;
+
+        latestWeather = { tempF, windMph, desc };
+
+        document.getElementById('wx-temp').textContent = tempF != null ? Math.round(tempF) + '°F' : '--°F';
+        document.getElementById('wx-wind').textContent = windMph != null ? Math.round(windMph) + ' mph' : '-- mph';
+        document.getElementById('wx-desc').textContent = desc || 'Conditions unavailable';
+      } catch (error) {
+        console.error('NWS API error:', error);
+        latestWeather = null;
+        document.getElementById('wx-desc').textContent = '⚠️ Live weather unavailable right now.';
+      }
+    }
+
+    // The beach has no free public crowd sensor, so this is an honest estimate
+    // built from real signals (time of day, weekend vs. weekday, live weather)
+    // rather than a random number - it's labeled as an estimate in the UI.
+    function computeCrowdScore() {
+      const now = new Date();
+      const hour = now.getHours() + now.getMinutes() / 60;
+      const isWeekend = now.getDay() === 0 || now.getDay() === 6;
+
+      // Gaussian curve peaking around 2pm, near-zero before dawn/after dusk
+      const timeFactor = Math.exp(-Math.pow(hour - 14, 2) / (2 * 3.2 * 3.2));
+      let score = timeFactor * (isWeekend ? 9.5 : 6);
+
+      if (latestWeather) {
+        if (latestWeather.tempF != null) {
+          if (latestWeather.tempF < 65) score *= 0.5;
+          else if (latestWeather.tempF > 95) score *= 0.8;
+          else score *= 1 + (latestWeather.tempF - 75) * 0.01;
+        }
+        if (latestWeather.windMph != null && latestWeather.windMph > 20) score *= 0.85;
+        const desc = (latestWeather.desc || '').toLowerCase();
+        if (/rain|storm|thunder|shower/.test(desc)) score *= 0.4;
+        else if (/cloud|overcast|fog/.test(desc)) score *= 0.85;
+      }
+
+      score += (Math.random() - 0.5) * 0.8; // small natural variability
+      return Math.max(0.5, Math.min(10, score));
     }
 
     function refreshData() {
-      const crowdScore = 2.8 + Math.random() * 7.2; // 2.8 to 10
+      const crowdScore = computeCrowdScore();
       const fillPercentage = crowdScore * 10;
-      
+
       document.getElementById('fill').style.width = fillPercentage + "%";
-      
+
       let crowdStatus = "Chill";
       let crowdDesc = CROWD_DESCRIPTIONS.chill;
-      
+
       if (crowdScore > 5) {
         crowdStatus = "Busy";
         crowdDesc = CROWD_DESCRIPTIONS.moderate;
@@ -1084,7 +973,7 @@
         crowdStatus = "Packed";
         crowdDesc = CROWD_DESCRIPTIONS.packed;
       }
-      
+
       document.getElementById('status').textContent = `${crowdStatus} • ${crowdScore.toFixed(1)} / 10`;
       document.getElementById('crowdDesc').textContent = crowdDesc;
 
@@ -1095,12 +984,13 @@
     // Initialize on load
     window.addEventListener('load', () => {
       createShimmers();
-      createOceanWaves();
       fetchTides();
-      refreshData();
       fetchBridgeTraffic();
-      // Crowd vibe refreshes every 30 seconds
+      fetchWeather().then(refreshData);
+      // Crowd estimate refreshes every 30 seconds
       setInterval(refreshData, 30000);
+      // Live weather refreshes every 10 minutes - NWS stations report roughly hourly
+      setInterval(fetchWeather, 600000);
       // Real traffic data refreshes every 5 minutes - this API key is shared by
       // every visitor to the site, so we keep this conservative to stay well
       // under TomTom's free daily request quota.
